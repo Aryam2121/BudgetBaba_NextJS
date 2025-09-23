@@ -194,23 +194,23 @@ export default function ExpensesPage() {
       <DashboardLayout>
         <div className="space-y-6">
           {/* Header */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">All Expenses</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">All Expenses</h1>
+              <p className="text-slate-600 mt-1 text-sm sm:text-base">
                 {loading ? 'Loading...' : `${filteredCount} expenses • Total: $${totalAmount.toFixed(2)}`}
               </p>
             </div>
             
-            <div className="flex items-center space-x-3">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
               <Link href="/expenses/upload">
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="w-full sm:w-auto">
                   <Upload className="h-4 w-4 mr-2" />
                   Upload CSV
                 </Button>
               </Link>
               <Link href="/expenses/new">
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Expense
                 </Button>
@@ -219,14 +219,14 @@ export default function ExpensesPage() {
           </div>
 
           {/* Stats Cards */}
-          <div className="grid gap-4 md:grid-cols-4">
+          <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
             <Card className="bg-white/60 backdrop-blur-sm border-white/20">
               <CardContent className="p-4">
                 <div className="flex items-center">
-                  <Receipt className="h-8 w-8 text-blue-500" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Expenses</p>
-                    <p className="text-2xl font-bold text-slate-800">{filteredCount}</p>
+                  <Receipt className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Total Expenses</p>
+                    <p className="text-lg sm:text-2xl font-bold text-slate-800">{filteredCount}</p>
                   </div>
                 </div>
               </CardContent>
@@ -235,10 +235,10 @@ export default function ExpensesPage() {
             <Card className="bg-white/60 backdrop-blur-sm border-white/20">
               <CardContent className="p-4">
                 <div className="flex items-center">
-                  <DollarSign className="h-8 w-8 text-green-500" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Amount</p>
-                    <p className="text-2xl font-bold text-slate-800">${totalAmount.toFixed(2)}</p>
+                  <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Total Amount</p>
+                    <p className="text-lg sm:text-2xl font-bold text-slate-800">${totalAmount.toFixed(2)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -247,10 +247,10 @@ export default function ExpensesPage() {
             <Card className="bg-white/60 backdrop-blur-sm border-white/20">
               <CardContent className="p-4">
                 <div className="flex items-center">
-                  <TrendingUp className="h-8 w-8 text-purple-500" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Average</p>
-                    <p className="text-2xl font-bold text-slate-800">
+                  <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Average</p>
+                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
                       ${filteredCount > 0 ? (totalAmount / filteredCount).toFixed(2) : '0.00'}
                     </p>
                   </div>
@@ -261,10 +261,10 @@ export default function ExpensesPage() {
             <Card className="bg-white/60 backdrop-blur-sm border-white/20">
               <CardContent className="p-4">
                 <div className="flex items-center">
-                  <TrendingDown className="h-8 w-8 text-orange-500" />
-                  <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Categories</p>
-                    <p className="text-2xl font-bold text-slate-800">
+                  <TrendingDown className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 flex-shrink-0" />
+                  <div className="ml-3 sm:ml-4 min-w-0">
+                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Categories</p>
+                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
                       {new Set(expenses.map(e => e.category)).size}
                     </p>
                   </div>
@@ -279,9 +279,9 @@ export default function ExpensesPage() {
               <CardTitle className="text-lg">Filters & Search</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-col md:flex-row gap-4">
-                {/* Search */}
-                <div className="flex-1">
+              <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-6">
+                {/* Search - takes full width on mobile */}
+                <div className="sm:col-span-2 lg:col-span-2">
                   <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
                     <Input
@@ -295,7 +295,7 @@ export default function ExpensesPage() {
                 
                 {/* Category Filter */}
                 <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-                  <SelectTrigger className="md:w-48">
+                  <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -310,9 +310,11 @@ export default function ExpensesPage() {
                 {/* Date From */}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="md:w-40 justify-start">
+                    <Button variant="outline" className="justify-start">
                       <CalendarIcon className="h-4 w-4 mr-2" />
-                      {dateFrom ? format(dateFrom, 'MMM dd') : 'From Date'}
+                      <span className="truncate">
+                        {dateFrom ? format(dateFrom, 'MMM dd') : 'From Date'}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -328,9 +330,11 @@ export default function ExpensesPage() {
                 {/* Date To */}
                 <Popover>
                   <PopoverTrigger asChild>
-                    <Button variant="outline" className="md:w-40 justify-start">
+                    <Button variant="outline" className="justify-start">
                       <CalendarIcon className="h-4 w-4 mr-2" />
-                      {dateTo ? format(dateTo, 'MMM dd') : 'To Date'}
+                      <span className="truncate">
+                        {dateTo ? format(dateTo, 'MMM dd') : 'To Date'}
+                      </span>
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
@@ -342,16 +346,19 @@ export default function ExpensesPage() {
                     />
                   </PopoverContent>
                 </Popover>
-                
-                {/* Clear Filters */}
-                <Button variant="outline" onClick={clearFilters}>
+              </div>
+              
+              {/* Clear Filters Button - Separate row for better mobile experience */}
+              <div className="mt-4 flex justify-end">
+                <Button variant="outline" onClick={clearFilters} size="sm">
+                  <Filter className="h-4 w-4 mr-2" />
                   Clear Filters
                 </Button>
               </div>
             </CardContent>
           </Card>
 
-          {/* Expenses Table */}
+          {/* Expenses Table/Cards */}
           <Card className="bg-white/60 backdrop-blur-sm border-white/20">
             <CardHeader>
               <CardTitle className="text-lg">Expense Details</CardTitle>
@@ -363,60 +370,148 @@ export default function ExpensesPage() {
               {loading ? (
                 <ExpensesTableSkeleton />
               ) : filteredAndSortedExpenses.length > 0 ? (
-                <div className="overflow-x-auto">
-                  <Table>
-                    <TableHeader>
-                      <TableRow>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-slate-100 transition-colors"
+                <>
+                  {/* Desktop Table View */}
+                  <div className="hidden lg:block overflow-x-auto">
+                    <Table>
+                      <TableHeader>
+                        <TableRow>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-slate-100 transition-colors"
+                            onClick={() => handleSort('date')}
+                          >
+                            Date
+                            <ArrowUpDown className="ml-2 h-4 w-4 inline" />
+                          </TableHead>
+                          <TableHead>Description</TableHead>
+                          <TableHead 
+                            className="cursor-pointer hover:bg-slate-100 transition-colors"
+                            onClick={() => handleSort('category')}
+                          >
+                            Category
+                            <ArrowUpDown className="ml-2 h-4 w-4 inline" />
+                          </TableHead>
+                          <TableHead>Vendor</TableHead>
+                          <TableHead 
+                            className="text-right cursor-pointer hover:bg-slate-100 transition-colors"
+                            onClick={() => handleSort('amount')}
+                          >
+                            Amount
+                            <ArrowUpDown className="ml-2 h-4 w-4 inline" />
+                          </TableHead>
+                          <TableHead className="text-right">Actions</TableHead>
+                        </TableRow>
+                      </TableHeader>
+                      <TableBody>
+                        {filteredAndSortedExpenses.map((expense) => (
+                          <TableRow key={expense._id} className="hover:bg-slate-50/50">
+                            <TableCell className="font-medium">
+                              {format(new Date(expense.date), 'MMM dd, yyyy')}
+                            </TableCell>
+                            <TableCell>
+                              <div className="max-w-xs truncate">
+                                {expense.description || expense.note || 'No description'}
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                                {expense.category}
+                              </Badge>
+                            </TableCell>
+                            <TableCell>
+                              {expense.vendor || '-'}
+                            </TableCell>
+                            <TableCell className="text-right font-bold">
+                              ${expense.amount.toFixed(2)}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              <div className="flex items-center justify-end space-x-2">
+                                <Button variant="ghost" size="sm">
+                                  <Eye className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm">
+                                  <Edit className="h-4 w-4" />
+                                </Button>
+                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </TableCell>
+                          </TableRow>
+                        ))}
+                      </TableBody>
+                    </Table>
+                  </div>
+                  
+                  {/* Mobile Card View */}
+                  <div className="lg:hidden space-y-4">
+                    {/* Mobile Sort Controls */}
+                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                      <span className="text-sm font-medium text-slate-600">Sort by:</span>
+                      <div className="flex items-center space-x-2">
+                        <Button
+                          variant={sortField === 'date' ? 'default' : 'ghost'}
+                          size="sm"
                           onClick={() => handleSort('date')}
                         >
                           Date
-                          <ArrowUpDown className="ml-2 h-4 w-4 inline" />
-                        </TableHead>
-                        <TableHead>Description</TableHead>
-                        <TableHead 
-                          className="cursor-pointer hover:bg-slate-100 transition-colors"
-                          onClick={() => handleSort('category')}
-                        >
-                          Category
-                          <ArrowUpDown className="ml-2 h-4 w-4 inline" />
-                        </TableHead>
-                        <TableHead>Vendor</TableHead>
-                        <TableHead 
-                          className="text-right cursor-pointer hover:bg-slate-100 transition-colors"
+                        </Button>
+                        <Button
+                          variant={sortField === 'amount' ? 'default' : 'ghost'}
+                          size="sm"
                           onClick={() => handleSort('amount')}
                         >
                           Amount
-                          <ArrowUpDown className="ml-2 h-4 w-4 inline" />
-                        </TableHead>
-                        <TableHead className="text-right">Actions</TableHead>
-                      </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                      {filteredAndSortedExpenses.map((expense) => (
-                        <TableRow key={expense._id} className="hover:bg-slate-50/50">
-                          <TableCell className="font-medium">
-                            {format(new Date(expense.date), 'MMM dd, yyyy')}
-                          </TableCell>
-                          <TableCell>
-                            <div className="max-w-xs truncate">
-                              {expense.description || expense.note || 'No description'}
+                        </Button>
+                        <Button
+                          variant={sortField === 'category' ? 'default' : 'ghost'}
+                          size="sm"
+                          onClick={() => handleSort('category')}
+                        >
+                          Category
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {/* Expense Cards */}
+                    {filteredAndSortedExpenses.map((expense, index) => (
+                      <Card 
+                        key={expense._id} 
+                        className="bg-white/40 hover:bg-white/60 transition-colors cursor-pointer"
+                        style={{ animationDelay: `${index * 50}ms` }}
+                      >
+                        <CardContent className="p-4">
+                          <div className="flex items-center justify-between mb-3">
+                            <div className="flex items-center space-x-3">
+                              <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center">
+                                <Receipt className="h-5 w-5 text-blue-600" />
+                              </div>
+                              <div>
+                                <p className="font-medium text-slate-800 truncate">
+                                  {expense.description || expense.note || 'No description'}
+                                </p>
+                                <p className="text-sm text-slate-500">
+                                  {format(new Date(expense.date), 'MMM dd, yyyy')}
+                                </p>
+                              </div>
                             </div>
-                          </TableCell>
-                          <TableCell>
-                            <Badge variant="secondary" className="bg-blue-100 text-blue-800">
-                              {expense.category}
-                            </Badge>
-                          </TableCell>
-                          <TableCell>
-                            {expense.vendor || '-'}
-                          </TableCell>
-                          <TableCell className="text-right font-bold">
-                            ${expense.amount.toFixed(2)}
-                          </TableCell>
-                          <TableCell className="text-right">
-                            <div className="flex items-center justify-end space-x-2">
+                            <div className="text-right">
+                              <p className="font-bold text-lg text-slate-800">
+                                ${expense.amount.toFixed(2)}
+                              </p>
+                              <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
+                                {expense.category}
+                              </Badge>
+                            </div>
+                          </div>
+                          
+                          <div className="flex items-center justify-between">
+                            <div className="text-sm text-slate-600">
+                              {expense.vendor && (
+                                <span>Vendor: {expense.vendor}</span>
+                              )}
+                            </div>
+                            <div className="flex items-center space-x-2">
                               <Button variant="ghost" size="sm">
                                 <Eye className="h-4 w-4" />
                               </Button>
@@ -427,21 +522,29 @@ export default function ExpensesPage() {
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
-                          </TableCell>
-                        </TableRow>
-                      ))}
-                    </TableBody>
-                  </Table>
-                </div>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </>
               ) : (
                 <div className="text-center py-8">
                   <Receipt className="h-12 w-12 text-slate-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-slate-600 mb-2">No expenses found</h3>
-                  <p className="text-slate-500">
+                  <p className="text-slate-500 text-sm">
                     {searchQuery || selectedCategory !== 'All Categories' || dateFrom || dateTo
                       ? 'Try adjusting your filters'
                       : 'Add your first expense to get started'}
                   </p>
+                  {!searchQuery && selectedCategory === 'All Categories' && !dateFrom && !dateTo && (
+                    <Link href="/expenses/new" className="mt-4 inline-block">
+                      <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Your First Expense
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               )}
             </CardContent>

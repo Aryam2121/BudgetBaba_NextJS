@@ -37,8 +37,13 @@ const pathLabels: Record<string, string> = {
   '/splits': 'Expense Splits',
   '/groups': 'Groups',
   '/budget': 'Budget Tracker',
+  '/goals': 'Goals Tracking',
+  '/recurring': 'Recurring Transactions',
+  '/notifications': 'Notifications',
+  '/exports': 'Data Exports',
   '/reports': 'Reports',
   '/analytics': 'Analytics',
+  '/system-status': 'System Status',
   '/settings': 'Settings',
   '/help': 'Help & Support'
 }
@@ -135,26 +140,30 @@ export function ModernTopBar({ className }: TopBarProps) {
               Filter
             </Button>
             
-            <Button variant="outline" size="sm">
-              <Download className="h-4 w-4 mr-1" />
-              Export
-            </Button>
+            <Link href="/exports">
+              <Button variant="outline" size="sm">
+                <Download className="h-4 w-4 mr-1" />
+                Export
+              </Button>
+            </Link>
           </div>
 
           {/* Notifications */}
-          <div className="relative">
-            <Button variant="ghost" size="sm" className="relative p-2">
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 && (
-                <Badge 
-                  variant="destructive" 
-                  className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
-                >
-                  {unreadCount}
-                </Badge>
-              )}
-            </Button>
-          </div>
+          <Link href="/notifications">
+            <div className="relative">
+              <Button variant="ghost" size="sm" className="relative p-2">
+                <Bell className="h-5 w-5" />
+                {unreadCount > 0 && (
+                  <Badge 
+                    variant="destructive" 
+                    className="absolute -top-1 -right-1 h-5 w-5 flex items-center justify-center p-0 text-xs"
+                  >
+                    {unreadCount}
+                  </Badge>
+                )}
+              </Button>
+            </div>
+          </Link>
 
           {/* Theme Toggle */}
           <Button variant="ghost" size="sm" className="p-2">

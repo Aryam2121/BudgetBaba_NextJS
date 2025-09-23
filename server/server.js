@@ -4,12 +4,19 @@ const cors = require("cors")
 const path = require("path")
 const http = require("http")
 const socketIo = require("socket.io")
+const SchedulerService = require("./services/SchedulerService")
 require("dotenv").config({ path: path.join(__dirname, "..", ".env") })
 
 const authRoutes = require("./routes/auth")
 const expenseRoutes = require("./routes/expenses")
 const splitRoutes = require("./routes/splits")
 const emailRoutes = require("./routes/email")
+const analyticsRoutes = require("./routes/analytics")
+const notificationRoutes = require("./routes/notifications")
+const goalRoutes = require("./routes/goals")
+const recurringRoutes = require("./routes/recurring")
+const budgetRoutes = require("./routes/budgets")
+const exportRoutes = require("./routes/exports")
 
 const app = express()
 const server = http.createServer(app)
@@ -60,15 +67,24 @@ app.use("/api/auth", authRoutes)
 app.use("/api/expenses", expenseRoutes)
 app.use("/api/splits", splitRoutes)
 app.use("/api/email", emailRoutes)
+app.use("/api/analytics", analyticsRoutes)
+app.use("/api/notifications", notificationRoutes)
+app.use("/api/goals", goalRoutes)
+app.use("/api/recurring", recurringRoutes)
+app.use("/api/budgets", budgetRoutes)
+app.use("/api/exports", exportRoutes)
 
 // Make io available to routes
 app.set('socketio', io)
+
+// Initialize scheduler service
+const scheduler = new SchedulerService(io)
 
 // Socket.IO connection handling
 io.on('connection', (socket) => {
   console.log('User connected:', socket.id)
 
-  // Join user to their personal room for split updates
+  // Join user to their personal room for notifications and updates
   socket.on('join-user-room', (userId) => {
     socket.join(`user-${userId}`)
     console.log(`User ${userId} joined room: user-${userId}`)
@@ -78,6 +94,27 @@ io.on('connection', (socket) => {
   socket.on('join-split-room', (splitId) => {
     socket.join(`split-${splitId}`)
     console.log(`Socket ${socket.id} joined split room: split-${splitId}`)
+  })
+
+  // Join goal-specific room
+  socket.on('join-goal-room', (goalId) => {
+    socket.join(`goal-${goalId}`)
+    console.log(`Socket ${socket.id} joined goal room: goal-${goalId}`)
+  })
+
+  // Join budget-specific room
+  socket.on('join-budget-room', (budgetId) => {
+    socket.join(`budget-${budgetId}`)
+    console.log(`Socket ${socket.id} joined budget room: budget-${budgetId}`)
+  })
+
+  // Handle notification acknowledgment
+  socket.on('notification-read', (data) => {
+    // Broadcast to user's room that notification was read
+    socket.to(`user-${data.userId}`).emit('notification-updated', {
+      notificationId: data.notificationId,
+      isRead: true
+    })
   })
 
   socket.on('disconnect', () => {
@@ -110,12 +147,35 @@ mongoose
     server.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`)
       console.log(`Environment: ${process.env.NODE_ENV}`)
-      console.log(`Socket.IO enabled for real-time split updates`)
+      console.log(`Socket.IO enabled for real-time updates`)
+      
+      // Start scheduler service
+      scheduler.start()
+      console.log(`Scheduler service started successfully`)
     })
   })
   .catch((error) => {
     console.error("MongoDB connection error:", error)
     process.exit(1)
   })
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM received, shutting down gracefully')
+  scheduler.stop()
+  server.close(() => {
+    mongoose.connection.close()
+    process.exit(0)
+  })
+})
+
+process.on('SIGINT', () => {
+  console.log('SIGINT received, shutting down gracefully')
+  scheduler.stop()
+  server.close(() => {
+    mongoose.connection.close()
+    process.exit(0)
+  })
+})
 
 module.exports = { app, server, io }

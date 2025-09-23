@@ -26,7 +26,11 @@ import {
   ChevronDown,
   Plus,
   Mail,
-  Calendar
+  Calendar,
+  RotateCcw,
+  Download,
+  Zap,
+  Activity
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -48,6 +52,12 @@ const navigationItems = [
         href: "/analytics", 
         icon: TrendingUp,
         badge: null
+      },
+      {
+        title: "Notifications",
+        href: "/notifications",
+        icon: Bell,
+        badge: 2 // Unread notifications
       }
     ]
   },
@@ -81,7 +91,30 @@ const navigationItems = [
     ]
   },
   {
-    title: "Splits & Groups",
+    title: "Financial Management",
+    items: [
+      {
+        title: "Budget Tracker",
+        href: "/budget",
+        icon: Target,
+        badge: null
+      },
+      {
+        title: "Goals Tracking",
+        href: "/goals",
+        icon: Zap,
+        badge: null
+      },
+      {
+        title: "Recurring Transactions",
+        href: "/recurring",
+        icon: RotateCcw,
+        badge: null
+      }
+    ]
+  },
+  {
+    title: "Collaboration",
     items: [
       {
         title: "Expense Splits",
@@ -98,12 +131,12 @@ const navigationItems = [
     ]
   },
   {
-    title: "Tools",
+    title: "Tools & Reports",
     items: [
       {
-        title: "Budget Tracker",
-        href: "/budget",
-        icon: Target,
+        title: "Data Exports",
+        href: "/exports",
+        icon: Download,
         badge: null
       },
       {
@@ -251,6 +284,18 @@ export function ModernSidebar({ className }: SidebarProps) {
 
           {/* Footer */}
           <div className="border-t border-slate-200/60 p-4 space-y-2">
+            <Link href="/system-status">
+              <Button
+                variant="ghost"
+                className={cn(
+                  "w-full justify-start h-10 px-3 text-slate-600 hover:text-slate-800 hover:bg-slate-50",
+                  isCollapsed && "justify-center px-0"
+                )}
+              >
+                <Activity className={cn("h-4 w-4", !isCollapsed && "mr-3")} />
+                {!isCollapsed && "System Status"}
+              </Button>
+            </Link>
             <Link href="/help">
               <Button
                 variant="ghost"

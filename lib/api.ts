@@ -4,16 +4,38 @@ interface ApiResponse<T = any> {
   data?: T
   error?: string
   message?: string
+  status?: number
+}
+
+interface PaginatedResponse<T> {
+  data: T[]
+  pagination: {
+    page: number
+    limit: number
+    total: number
+    pages: number
+  }
+}
+
+interface RequestOptions extends RequestInit {
+  timeout?: number
+  retries?: number
 }
 
 class ApiClient {
   private baseURL: string
+  private defaultTimeout = 10000 // 10 seconds
+  private defaultRetries = 3
 
   constructor(baseURL: string) {
     this.baseURL = baseURL
   }
 
-  private async request<T>(endpoint: string, options: RequestInit = {}): Promise<ApiResponse<T>> {
+  private async request<T>(
+    endpoint: string, 
+    options: RequestOptions = {}
+  ): Promise<ApiResponse<T>> {
+    const { timeout = this.defaultTimeout, retries = this.defaultRetries, ...fetchOptions } = options
     const url = `${this.baseURL}${endpoint}`
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
 
@@ -21,23 +43,89 @@ class ApiClient {
       headers: {
         "Content-Type": "application/json",
         ...(token && { Authorization: `Bearer ${token}` }),
-        ...options.headers,
+        ...fetchOptions.headers,
       },
-      ...options,
+      ...fetchOptions,
     }
 
-    try {
-      const response = await fetch(url, config)
-      const data = await response.json()
+    for (let attempt = 0; attempt <= retries; attempt++) {
+      try {
+        const controller = new AbortController()
+        const timeoutId = setTimeout(() => controller.abort(), timeout)
+        
+        const response = await fetch(url, {
+          ...config,
+          signal: controller.signal,
+        })
+        
+        clearTimeout(timeoutId)
 
-      if (!response.ok) {
-        return { error: data.error || "An error occurred" }
+        // Handle empty responses
+        let data
+        const contentType = response.headers.get("content-type")
+        if (contentType && contentType.includes("application/json")) {
+          data = await response.json()
+        } else {
+          data = await response.text()
+        }
+
+        if (!response.ok) {
+          // Handle authentication errors
+          if (response.status === 401) {
+            if (typeof window !== "undefined") {
+              localStorage.removeItem("token")
+              window.location.href = "/auth/login"
+            }
+            return { 
+              error: "Authentication required", 
+              status: 401 
+            }
+          }
+
+          return { 
+            error: data?.error || data?.message || `HTTP ${response.status}`, 
+            status: response.status 
+          }
+        }
+
+        return { data, status: response.status }
+      } catch (error: any) {
+        if (error.name === 'AbortError') {
+          if (attempt === retries) {
+            return { error: "Request timeout. Please try again.", status: 408 }
+          }
+          continue
+        }
+
+        if (attempt === retries) {
+          return { 
+            error: error.message || "Network error. Please check your connection.", 
+            status: 0 
+          }
+        }
+
+        // Wait before retry (exponential backoff)
+        await new Promise(resolve => setTimeout(resolve, Math.pow(2, attempt) * 1000))
       }
-
-      return { data }
-    } catch (error) {
-      return { error: "Network error. Please check your connection." }
     }
+
+    return { error: "Max retries exceeded", status: 0 }
+  }
+
+  private buildQueryString(params: Record<string, any>): string {
+    const searchParams = new URLSearchParams()
+    
+    Object.entries(params).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== '') {
+        if (Array.isArray(value)) {
+          value.forEach(v => searchParams.append(`${key}[]`, String(v)))
+        } else {
+          searchParams.append(key, String(value))
+        }
+      }
+    })
+
+    return searchParams.toString()
   }
 
   // Auth methods
@@ -55,6 +143,36 @@ class ApiClient {
     })
   }
 
+  async logout() {
+    const result = await this.request<{}>("/auth/logout", {
+      method: "POST",
+    })
+    
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("token")
+    }
+    
+    return result
+  }
+
+  async getProfile() {
+    return this.request<any>("/auth/profile")
+  }
+
+  async updateProfile(userData: { name?: string; email?: string }) {
+    return this.request<any>("/auth/profile", {
+      method: "PUT",
+      body: JSON.stringify(userData),
+    })
+  }
+
+  async changePassword(passwords: { currentPassword: string; newPassword: string }) {
+    return this.request<{}>("/auth/change-password", {
+      method: "POST",
+      body: JSON.stringify(passwords),
+    })
+  }
+
   // Google OAuth methods
   async getGoogleAuthUrl() {
     return this.request<{ authUrl: string }>("/auth/google", {
@@ -69,7 +187,7 @@ class ApiClient {
     })
   }
 
-  async updateBudget(monthlyBudget: number) {
+  async updateUserBudget(monthlyBudget: number) {
     return this.request<{ user: any }>("/auth/budget", {
       method: "PUT",
       body: JSON.stringify({ monthlyBudget }),
@@ -77,14 +195,22 @@ class ApiClient {
   }
 
   // Expense methods
-  async getExpenses(filters?: { from?: string; to?: string; category?: string }) {
-    const params = new URLSearchParams()
-    if (filters?.from) params.append("from", filters.from)
-    if (filters?.to) params.append("to", filters.to)
-    if (filters?.category) params.append("category", filters.category)
+  async getExpenses(filters?: { 
+    from?: string 
+    to?: string 
+    category?: string
+    search?: string
+    sortBy?: 'date' | 'amount' | 'category'
+    sortOrder?: 'asc' | 'desc'
+    page?: number
+    limit?: number
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<PaginatedResponse<any>>(`/expenses${queryString ? `?${queryString}` : ""}`)
+  }
 
-    const queryString = params.toString()
-    return this.request<any[]>(`/expenses${queryString ? `?${queryString}` : ""}`)
+  async getExpense(id: string) {
+    return this.request<any>(`/expenses/${id}`)
   }
 
   async addExpense(expenseData: {
@@ -100,6 +226,25 @@ class ApiClient {
     })
   }
 
+  async updateExpense(id: string, expenseData: {
+    amount?: number
+    date?: string
+    note?: string
+    vendor?: string
+    category?: string
+  }) {
+    return this.request<any>(`/expenses/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(expenseData),
+    })
+  }
+
+  async deleteExpense(id: string) {
+    return this.request<{}>(`/expenses/${id}`, {
+      method: "DELETE",
+    })
+  }
+
   async uploadExpenses(expenses: any[]) {
     return this.request<any>("/expenses/upload", {
       method: "POST",
@@ -107,12 +252,31 @@ class ApiClient {
     })
   }
 
-  async getMonthlySummary() {
-    return this.request<any>("/expenses/summary/monthly")
+  async getCategories() {
+    return this.request<string[]>("/expenses/categories")
+  }
+
+  async getMonthlySummary(year?: number, month?: number) {
+    const params = year && month ? this.buildQueryString({ year, month }) : ''
+    return this.request<any>(`/expenses/summary/monthly${params ? `?${params}` : ''}`)
+  }
+
+  async getYearlySummary(year?: number) {
+    const params = year ? this.buildQueryString({ year }) : ''
+    return this.request<any>(`/expenses/summary/yearly${params ? `?${params}` : ''}`)
   }
 
   async getDashboardStats() {
     return this.request<any>("/expenses/dashboard/stats")
+  }
+
+  async getExpenseAnalytics(filters?: {
+    from?: string
+    to?: string
+    groupBy?: 'day' | 'week' | 'month' | 'category'
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/expenses/analytics${queryString ? `?${queryString}` : ""}`)
   }
 
   // Split methods
@@ -137,17 +301,36 @@ class ApiClient {
     })
   }
 
-  async getSplits(filters?: { status?: "settled" | "unsettled"; type?: string }) {
-    const params = new URLSearchParams()
-    if (filters?.status) params.append("status", filters.status)
-    if (filters?.type) params.append("type", filters.type)
-
-    const queryString = params.toString()
-    return this.request<any>(`/splits${queryString ? `?${queryString}` : ""}`)
+  async getSplits(filters?: { 
+    status?: "settled" | "unsettled" 
+    type?: string
+    page?: number
+    limit?: number
+    search?: string
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<PaginatedResponse<any>>(`/splits${queryString ? `?${queryString}` : ""}`)
   }
 
   async getSplitDetails(splitId: string) {
     return this.request<any>(`/splits/${splitId}`)
+  }
+
+  async updateSplit(splitId: string, splitData: {
+    title?: string
+    description?: string
+    participants?: Array<{
+      email: string
+      name: string
+      userId?: string
+      amount?: number
+      percentage?: number
+    }>
+  }) {
+    return this.request<any>(`/splits/${splitId}`, {
+      method: "PUT",
+      body: JSON.stringify(splitData),
+    })
   }
 
   async markSplitAsPaid(splitId: string, participantEmail: string) {
@@ -166,6 +349,10 @@ class ApiClient {
     return this.request<any>(`/splits/${splitId}`, {
       method: "DELETE",
     })
+  }
+
+  async getSplitSummary() {
+    return this.request<any>("/splits/summary")
   }
 
   // Email methods
@@ -200,6 +387,395 @@ class ApiClient {
   async testEmailConnection(provider: "gmail" | "outlook") {
     return this.request<any>(`/email/test/${provider}`, {
       method: "POST",
+    })
+  }
+
+  // Analytics methods
+  async getAdvancedAnalytics(filters?: {
+    startDate?: string
+    endDate?: string
+    period?: 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    categories?: string[]
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/expenses${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getCategoryInsights(filters?: { period?: string; limit?: number }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/categories${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSpendingTrends(filters?: { 
+    period?: 'daily' | 'weekly' | 'monthly'
+    months?: number 
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/spending-trends${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getPeriodComparison(filters?: {
+    currentStart?: string
+    currentEnd?: string
+    compareStart?: string
+    compareEnd?: string
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/period-comparison${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getVendorAnalysis(filters?: { limit?: number; minTransactions?: number }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/vendors${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSpendingPatterns() {
+    return this.request<any>("/analytics/spending-patterns")
+  }
+
+  async getAdvancedBudgetAnalytics() {
+    return this.request<any>("/analytics/budget")
+  }
+
+  async getSmartInsights() {
+    return this.request<any>("/analytics/insights")
+  }
+
+  // Notifications methods
+  async getNotifications(filters?: {
+    type?: string
+    isRead?: boolean
+    priority?: 'low' | 'medium' | 'high'
+    page?: number
+    limit?: number
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<PaginatedResponse<any>>(`/notifications${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async markNotificationAsRead(notificationId: string) {
+    return this.request<any>(`/notifications/${notificationId}/read`, {
+      method: "PATCH",
+    })
+  }
+
+  async markAllNotificationsAsRead() {
+    return this.request<any>("/notifications/mark-all-read", {
+      method: "PATCH",
+    })
+  }
+
+  async deleteNotification(notificationId: string) {
+    return this.request<any>(`/notifications/${notificationId}`, {
+      method: "DELETE",
+    })
+  }
+
+  async getNotificationSettings() {
+    return this.request<any>("/notifications/settings")
+  }
+
+  async updateNotificationSettings(settings: {
+    email?: boolean
+    push?: boolean
+    inApp?: boolean
+    types?: {
+      split_created?: boolean
+      split_updated?: boolean
+      payment_reminder?: boolean
+      goal_milestone?: boolean
+      budget_alert?: boolean
+      recurring_processed?: boolean
+    }
+  }) {
+    return this.request<any>("/notifications/settings", {
+      method: "PUT",
+      body: JSON.stringify(settings),
+    })
+  }
+
+  // Goals methods
+  async getGoals(filters?: {
+    status?: 'active' | 'completed' | 'paused'
+    type?: string
+    sort?: string
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/goals${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async createGoal(goalData: {
+    title: string
+    description?: string
+    type: string
+    targetAmount: number
+    targetDate: string
+    category?: string
+    priority?: 'low' | 'medium' | 'high'
+    reminderFrequency?: 'daily' | 'weekly' | 'monthly'
+    autoSave?: { enabled: boolean; amount?: number; frequency?: string }
+  }) {
+    return this.request<any>("/goals", {
+      method: "POST",
+      body: JSON.stringify(goalData),
+    })
+  }
+
+  async updateGoal(goalId: string, goalData: {
+    title?: string
+    description?: string
+    targetAmount?: number
+    targetDate?: string
+    status?: 'active' | 'completed' | 'paused'
+  }) {
+    return this.request<any>(`/goals/${goalId}`, {
+      method: "PUT",
+      body: JSON.stringify(goalData),
+    })
+  }
+
+  async deleteGoal(goalId: string) {
+    return this.request<any>(`/goals/${goalId}`, {
+      method: "DELETE",
+    })
+  }
+
+  async addGoalProgress(goalId: string, progressData: {
+    amount: number
+    note?: string
+  }) {
+    return this.request<any>(`/goals/${goalId}/progress`, {
+      method: "POST",
+      body: JSON.stringify(progressData),
+    })
+  }
+
+  async getGoalAnalytics() {
+    return this.request<any>("/goals/analytics")
+  }
+
+  // Recurring transactions methods
+  async getRecurringTransactions(filters?: {
+    isActive?: boolean
+    type?: 'expense' | 'income'
+    frequency?: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    page?: number
+    limit?: number
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<PaginatedResponse<any>>(`/recurring${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async createRecurringTransaction(transactionData: {
+    title: string
+    description?: string
+    amount: number
+    category: string
+    type: 'expense' | 'income'
+    frequency: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    startDate: string
+    endDate?: string
+    autoProcess?: boolean
+    notifications?: { enabled: boolean; daysBefore: number }
+    tags?: string[]
+  }) {
+    return this.request<any>("/recurring", {
+      method: "POST",
+      body: JSON.stringify(transactionData),
+    })
+  }
+
+  async updateRecurringTransaction(transactionId: string, transactionData: {
+    title?: string
+    description?: string
+    amount?: number
+    frequency?: string
+    isActive?: boolean
+    notifications?: { enabled: boolean; daysBefore: number }
+  }) {
+    return this.request<any>(`/recurring/${transactionId}`, {
+      method: "PUT",
+      body: JSON.stringify(transactionData),
+    })
+  }
+
+  async deleteRecurringTransaction(transactionId: string) {
+    return this.request<any>(`/recurring/${transactionId}`, {
+      method: "DELETE",
+    })
+  }
+
+  async processRecurringTransactions(transactionIds?: string[]) {
+    return this.request<any>("/recurring/process", {
+      method: "POST",
+      body: JSON.stringify({ transactionIds }),
+    })
+  }
+
+  async getRecurringAnalytics() {
+    return this.request<any>("/recurring/analytics")
+  }
+
+  // Budget methods
+  async getBudgets(filters?: {
+    isActive?: boolean
+    period?: 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    status?: 'good' | 'warning' | 'critical' | 'exceeded'
+    page?: number
+    limit?: number
+  }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<PaginatedResponse<any>>(`/budgets${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getBudget(budgetId: string) {
+    return this.request<any>(`/budgets/${budgetId}`)
+  }
+
+  async createBudget(budgetData: {
+    name: string
+    description?: string
+    period: 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    startDate: string
+    endDate: string
+    totalAmount: number
+    categories: Array<{
+      category: string
+      budgetAmount: number
+      alertThreshold?: number
+    }>
+    alertSettings?: {
+      enabled: boolean
+      thresholds: Array<{ percentage: number; notified: boolean }>
+    }
+    autoRollover?: boolean
+    tags?: string[]
+  }) {
+    return this.request<any>("/budgets", {
+      method: "POST",
+      body: JSON.stringify(budgetData),
+    })
+  }
+
+  async updateBudget(budgetId: string, budgetData: {
+    name?: string
+    description?: string
+    totalAmount?: number
+    categories?: Array<{
+      category: string
+      budgetAmount: number
+      alertThreshold?: number
+    }>
+    isActive?: boolean
+  }) {
+    return this.request<any>(`/budgets/${budgetId}`, {
+      method: "PUT",
+      body: JSON.stringify(budgetData),
+    })
+  }
+
+  async deleteBudget(budgetId: string) {
+    return this.request<any>(`/budgets/${budgetId}`, {
+      method: "DELETE",
+    })
+  }
+
+  async getBudgetAnalytics(period?: string) {
+    const queryString = period ? this.buildQueryString({ period }) : ''
+    return this.request<any>(`/budgets/analytics/overview${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async checkBudgetAlerts() {
+    return this.request<any>("/budgets/alerts/check")
+  }
+
+  // Export methods
+  async exportExpenses(exportData: {
+    format?: 'csv' | 'json'
+    startDate?: string
+    endDate?: string
+    category?: string
+    minAmount?: number
+    maxAmount?: number
+  }) {
+    const response = await fetch(`${this.baseURL}/exports/expenses`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(exportData),
+    })
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'expenses.csv'
+      return { data: { blob, filename } }
+    } else {
+      const error = await response.json()
+      return { error: error.error || 'Export failed' }
+    }
+  }
+
+  async exportSplits(exportData: {
+    format?: 'csv' | 'json'
+    status?: string
+    startDate?: string
+    endDate?: string
+  }) {
+    const response = await fetch(`${this.baseURL}/exports/splits`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(exportData),
+    })
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || 'splits.csv'
+      return { data: { blob, filename } }
+    } else {
+      const error = await response.json()
+      return { error: error.error || 'Export failed' }
+    }
+  }
+
+  async exportAllData(format: 'csv' | 'json' = 'json') {
+    const response = await fetch(`${this.baseURL}/exports/all`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify({ format }),
+    })
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `data-export.${format}`
+      return { data: { blob, filename } }
+    } else {
+      const error = await response.json()
+      return { error: error.error || 'Export failed' }
+    }
+  }
+
+  async getExportHistory(page?: number, limit?: number) {
+    const queryString = this.buildQueryString({ page, limit })
+    return this.request<PaginatedResponse<any>>(`/exports/history${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async generateReport(reportData: {
+    reportType?: 'weekly' | 'monthly' | 'quarterly' | 'yearly' | 'custom'
+    startDate?: string
+    endDate?: string
+    includeCharts?: boolean
+  }) {
+    return this.request<any>("/exports/report", {
+      method: "POST",
+      body: JSON.stringify(reportData),
     })
   }
 }

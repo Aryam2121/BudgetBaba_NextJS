@@ -1,321 +1,320 @@
-# Smart Expense Tracker MVP
+# Smart Expense Tracker
 
-A full-stack expense tracking application with intelligent categorization, budget management, and email notifications.
+A comprehensive full-stack expense tracking application with advanced analytics, goal tracking, automated recurring transactions, real-time notifications, and intelligent expense management.
 
-## Features
+## 🚀 Features
 
-- **User Authentication**: Secure JWT-based authentication with bcrypt password hashing
-- **Expense Management**: Add, view, and categorize expenses with auto-categorization
-- **Budget Tracking**: Set monthly budgets with real-time alerts and predictions
-- **Email Notifications**: Instant notifications for expenses, budget alerts, and weekly summaries
-- **CSV Upload**: Bulk import expenses from CSV files
-- **Interactive Dashboard**: Charts and visualizations using Recharts
-- **Responsive Design**: Mobile-first design with Tailwind CSS
+### Core Features
+- **Dashboard**: Real-time expense overview with interactive charts and quick actions
+- **Expense Management**: Add, categorize, and track expenses with receipt upload
+- **Budget Tracking**: Set budgets by category with real-time progress monitoring
+- **Expense Splits**: Share expenses with friends and groups with settlement tracking
+- **Advanced Analytics**: Interactive charts, trend analysis, and spending insights
 
-## Tech Stack
+### New Advanced Features (Phase 3)
+- **🎯 Goals Tracking**: Set and track financial goals with milestones and progress monitoring
+- **🔄 Recurring Transactions**: Automated recurring transaction management with scheduling
+- **🔔 Real-time Notifications**: Push notifications with Socket.IO integration and priority filtering
+- **📊 Enhanced Analytics**: Advanced analytics dashboard with multiple chart types and insights
+- **💰 Smart Budget Management**: Category-based budgets with real-time alerts and tracking
+- **📋 Data Export System**: Comprehensive export functionality with multiple formats (CSV, JSON, PDF, ZIP)
+- **📈 System Status Dashboard**: Real-time system health monitoring and API status tracking
+
+## 🛠 Technology Stack
 
 ### Frontend
-- **Next.js 14** - React framework with App Router
-- **TypeScript** - Type safety and better developer experience
-- **Tailwind CSS** - Utility-first CSS framework
-- **Recharts** - Chart library for data visualization
-- **shadcn/ui** - Modern UI components
+- **Next.js 14** with App Router
+- **TypeScript** for type safety
+- **Tailwind CSS** for styling
+- **shadcn/ui** components library
+- **Recharts** for data visualization
+- **Socket.IO Client** for real-time updates
 
 ### Backend
-- **Node.js** - JavaScript runtime
-- **Express.js** - Web application framework
-- **MongoDB** - NoSQL database with Mongoose ODM
-- **JWT** - JSON Web Tokens for authentication
-- **Nodemailer** - Email sending functionality
-- **bcryptjs** - Password hashing
+- **Node.js** with Express.js
+- **MongoDB** with Mongoose ODM
+- **JWT** authentication
+- **Socket.IO** for real-time features
+- **Nodemailer** for email notifications
+- **Multer** for file uploads
+- **Node-cron** for scheduling
 
-## Project Structure
+### Key Libraries
+- **Lucide React** for icons
+- **React Hook Form** for form handling
+- **Zod** for validation
+- **Date-fns** for date manipulation
+- **Sonner** for toast notifications
 
-\`\`\`
-smart-expense-tracker/
-├── app/                          # Next.js App Router pages
-│   ├── auth/                     # Authentication pages
-│   ├── dashboard/                # Main dashboard
-│   ├── expenses/                 # Expense management pages
-│   ├── budget/                   # Budget management
-│   └── layout.tsx                # Root layout
-├── components/                   # React components
-│   ├── charts/                   # Chart components
-│   ├── ui/                       # shadcn/ui components
-│   └── *.tsx                     # Feature components
-├── contexts/                     # React contexts
-├── lib/                          # Utility libraries
-├── server/                       # Express.js backend
-│   ├── controllers/              # Route controllers
-│   ├── models/                   # Mongoose models
-│   ├── routes/                   # API routes
-│   ├── utils/                    # Utility functions
-│   ├── middleware/               # Custom middleware
-│   └── server.js                 # Server entry point
-├── scripts/                      # Utility scripts
-└── docs/                         # Documentation
-\`\`\`
+## 📁 Project Structure
 
-## Quick Start
+```
+├── app/                    # Next.js app directory
+│   ├── dashboard/         # Dashboard page
+│   ├── expenses/          # Expense management pages
+│   ├── budget/           # Budget tracking page
+│   ├── goals/            # Goals tracking page (NEW)
+│   ├── recurring/        # Recurring transactions page (NEW)
+│   ├── notifications/    # Notifications center page (NEW)
+│   ├── analytics/        # Enhanced analytics page (UPDATED)
+│   ├── exports/          # Data export page (NEW)
+│   ├── splits/           # Expense splitting page
+│   ├── system-status/    # System status dashboard (NEW)
+│   └── auth/             # Authentication pages
+│
+├── components/            # React components
+│   ├── ui/               # shadcn/ui components
+│   ├── charts/           # Chart components
+│   ├── NotificationCenter.tsx    # Real-time notifications (NEW)
+│   ├── GoalsTracking.tsx         # Financial goals management (NEW)
+│   ├── RecurringTransactions.tsx # Recurring transactions (NEW)
+│   ├── AnalyticsDashboard.tsx    # Advanced analytics (NEW)
+│   ├── BudgetManagement.tsx      # Enhanced budgets (NEW)
+│   ├── ExportDashboard.tsx       # Data export system (NEW)
+│   ├── ModernSidebar.tsx         # Updated navigation (UPDATED)
+│   ├── ModernTopBar.tsx          # Updated top bar (UPDATED)
+│   └── DashboardLayout.tsx       # Layout wrapper
+│
+├── server/               # Backend server
+│   ├── controllers/      # API controllers
+│   ├── models/          # Database models
+│   ├── routes/          # API routes
+│   ├── middleware/      # Express middleware
+│   ├── utils/           # Utility functions
+│   └── services/        # Business logic services
+│
+├── lib/                 # Frontend utilities
+│   ├── api.ts          # API client (50+ methods)
+│   └── utils.ts        # Helper functions
+│
+└── contexts/           # React contexts
+    └── AuthContext.tsx # Authentication context
+```
 
-### Prerequisites
+## 🎯 New Components & Features
 
-- Node.js 18+ and npm
-- MongoDB database (local or cloud)
-- Email service credentials (Gmail, SendGrid, etc.)
+### 1. NotificationCenter.tsx
+- Real-time Socket.IO integration
+- Priority-based notification filtering
+- Mark as read/unread functionality
+- Push notification support
+- Notification history and management
 
-### Installation
+### 2. GoalsTracking.tsx
+- Financial goal creation and editing
+- Progress tracking with visual indicators
+- Milestone notifications
+- Goal categorization and analytics
+- Target date management
+
+### 3. RecurringTransactions.tsx
+- Automated transaction scheduling
+- Pause/resume functionality
+- Multiple frequency options (daily, weekly, monthly, yearly)
+- Next execution date tracking
+- Recurring transaction history
+
+### 4. AnalyticsDashboard.tsx
+- Interactive Recharts integration
+- Multiple analytics tabs (Overview, Trends, Categories, Insights)
+- Spending velocity tracking
+- Category analysis with insights
+- Export functionality for analytics data
+
+### 5. BudgetManagement.tsx
+- Category-based budget allocation
+- Real-time spending tracking
+- Budget alerts and notifications
+- Progress visualization
+- Budget vs actual spending comparison
+
+### 6. ExportDashboard.tsx
+- Multi-format data export (CSV, JSON, PDF, ZIP)
+- Export history tracking
+- Filtered export options
+- Scheduled export functionality
+- Download progress tracking
+
+## 🔌 API Integration
+
+The application includes 50+ API endpoints covering:
+
+### Core APIs
+- Authentication (login, register, refresh)
+- Expense management (CRUD operations)
+- Budget tracking and management
+- Split expense functionality
+
+### Advanced APIs (NEW)
+- **Goals API**: Goal CRUD, progress tracking, analytics
+- **Recurring API**: Transaction scheduling, automation
+- **Notifications API**: Real-time notifications, settings
+- **Analytics API**: Advanced analytics, trends, insights
+- **Export API**: Data export in multiple formats
+- **System API**: Health checks, status monitoring
+
+## 🔄 Real-time Features
+
+- **Socket.IO Integration**: Real-time notifications and updates
+- **Live Data Updates**: Automatic data refresh across components
+- **Push Notifications**: Browser push notification support
+- **Real-time Charts**: Live updating analytics charts
+- **System Health Monitoring**: Real-time system status tracking
+
+## 📱 Mobile Responsiveness
+
+All components are built with mobile-first design:
+- Responsive grid layouts
+- Touch-friendly interfaces
+- Mobile navigation optimization
+- Swipe gestures support
+- Progressive Web App features
+
+## 🎨 UI/UX Features
+
+- **Modern Design**: Glass morphism and gradient effects
+- **Dark Mode Support**: System theme integration
+- **Animations**: Smooth transitions and micro-interactions
+- **Accessibility**: ARIA labels and keyboard navigation
+- **Toast Notifications**: Real-time feedback system
+
+## 🔧 Development Setup
 
 1. **Clone the repository**
-   \`\`\`bash
-   git clone <repository-url>
+   ```bash
+   git clone [repository-url]
    cd smart-expense-tracker
-   \`\`\`
+   ```
 
 2. **Install dependencies**
-   \`\`\`bash
-   # Install frontend dependencies
+   ```bash
+   # Frontend dependencies
    npm install
    
-   # Install backend dependencies
+   # Backend dependencies
    cd server
    npm install
-   cd ..
-   \`\`\`
+   ```
 
-3. **Environment Setup**
-   \`\`\`bash
-   # Copy environment template
-   cp .env.example .env
+3. **Environment Variables**
+   ```env
+   # Frontend (.env.local)
+   NEXT_PUBLIC_API_URL=http://localhost:5000
+   NEXT_PUBLIC_SOCKET_URL=http://localhost:5000
    
-   # Edit .env with your configuration
-   nano .env
-   \`\`\`
+   # Backend (.env)
+   MONGODB_URI=mongodb://localhost:27017/expense-tracker
+   JWT_SECRET=your-jwt-secret
+   SMTP_HOST=smtp.gmail.com
+   SMTP_PORT=587
+   SMTP_USER=your-email@gmail.com
+   SMTP_PASS=your-app-password
+   ```
 
-4. **Start the application**
-   \`\`\`bash
-   # Start backend server (in one terminal)
+4. **Start the development servers**
+   ```bash
+   # Terminal 1: Start backend server
    cd server
    npm run dev
    
-   # Start frontend (in another terminal)
+   # Terminal 2: Start frontend
    npm run dev
-   \`\`\`
+   ```
 
 5. **Access the application**
-   - Frontend: http://localhost:3000
-   - Backend API: http://localhost:5000
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:5000`
+   - System Status: `http://localhost:3000/system-status`
 
-## Environment Variables
+## 🚀 Deployment
 
-Create a `.env` file in the root directory with the following variables:
+### Using the provided scripts:
+```bash
+# Start all services
+./start-app.bat       # Windows (All services)
+./start-frontend.bat  # Frontend only
+./start-server.bat    # Backend only
+```
 
-\`\`\`env
-# Database
-MONGODB_URI=mongodb://localhost:27017/expense-tracker
+### Production deployment:
+1. Build the frontend: `npm run build`
+2. Start the backend: `cd server && npm start`
+3. Configure environment variables for production
+4. Set up MongoDB connection
+5. Configure email service (SMTP)
 
-# JWT Secret
-JWT_SECRET=your-super-secret-jwt-key-here
+## 📊 System Monitoring
 
-# Email Configuration
-MAIL_SERVICE=gmail
-MAIL_USER=your-email@gmail.com
-MAIL_PASS=your-app-password
-MAIL_FROM=Smart Expense Tracker <your-email@gmail.com>
+Access the **System Status Dashboard** at `/system-status` to monitor:
+- Overall system health (95%+)
+- Frontend/Backend status
+- Database connectivity
+- API endpoint health
+- Real-time integration status
+- Module status and versions
 
-# Development Settings
-NODE_ENV=development
-SEND_REAL_EMAILS=false
+## 🧪 Testing
 
-# Frontend API URL
-NEXT_PUBLIC_API_URL=http://localhost:5000/api
-\`\`\`
+- **Component Testing**: Test all new React components
+- **API Testing**: Test all 50+ API endpoints
+- **Integration Testing**: Test Socket.IO and real-time features
+- **Mobile Testing**: Test responsive design on various devices
+- **Performance Testing**: Monitor loading times and responsiveness
 
-### Email Setup
+## 🔒 Security Features
 
-#### Gmail Setup
-1. Enable 2-factor authentication on your Gmail account
-2. Generate an App Password: Google Account → Security → App passwords
-3. Use the app password as `MAIL_PASS`
-
-#### SendGrid Setup
-\`\`\`env
-MAIL_HOST=smtp.sendgrid.net
-MAIL_PORT=587
-MAIL_USER=apikey
-MAIL_PASS=your-sendgrid-api-key
-\`\`\`
-
-## API Endpoints
-
-### Authentication
-- `POST /api/auth/register` - User registration
-- `POST /api/auth/login` - User login
-- `PUT /api/auth/budget` - Update monthly budget
-
-### Expenses
-- `GET /api/expenses` - Get user expenses (with filters)
-- `POST /api/expenses` - Add new expense
-- `POST /api/expenses/upload` - Bulk upload from CSV
-- `GET /api/expenses/summary/monthly` - Monthly summary and trends
-
-## Features in Detail
-
-### Auto-Categorization
-
-The system automatically categorizes expenses based on vendor names and descriptions:
-
-- **Food**: Zomato, Swiggy, restaurants, groceries
-- **Transport**: Uber, Ola, fuel, parking
-- **Shopping**: Amazon, Flipkart, electronics
-- **Entertainment**: Netflix, movies, subscriptions
-- **Bills**: Electricity, internet, mobile recharge
-- **Healthcare**: Hospitals, medicines, insurance
-- **Education**: Schools, courses, books
-
-### Budget Management
-
-- Set monthly spending limits
-- Real-time budget tracking with visual progress bars
-- Three levels of alerts:
-  - **90% Warning**: When approaching budget limit
-  - **Budget Exceeded**: When limit is crossed
-  - **Predictive Alerts**: Based on spending patterns
-
-### Email Notifications
-
-- **Expense Notifications**: Instant alerts for new expenses
-- **Budget Alerts**: Warnings when approaching or exceeding limits
-- **Weekly Summaries**: Spending breakdown and insights
-- **Bulk Upload Confirmations**: CSV processing results
-
-### CSV Upload Format
-
-Your CSV file should include these columns (case-insensitive):
-- `amount` (required) - Expense amount
-- `date` (required) - Transaction date (YYYY-MM-DD)
-- `vendor` (optional) - Store or service name
-- `note` (optional) - Additional description
-
-Example CSV:
-\`\`\`csv
-amount,date,vendor,note
-25.50,2024-01-15,Zomato,Lunch order
-500.00,2024-01-14,Uber,Ride to airport
-1200.00,2024-01-13,Amazon,Mobile phone
-\`\`\`
-
-## Development
-
-### Running Tests
-
-\`\`\`bash
-# Backend tests
-cd server
-npm test
-
-# Test categorization logic
-node scripts/test-categorization.js
-\`\`\`
-
-### Database Seeding
-
-\`\`\`bash
-# Create sample data
-cd server
-node scripts/seed-database.js
-\`\`\`
-
-### Weekly Summary Automation
-
-Set up a cron job to send weekly summaries:
-
-\`\`\`bash
-# Add to crontab (runs every Sunday at 9 AM)
-0 9 * * 0 cd /path/to/project && node scripts/send-weekly-summary.js
-\`\`\`
-
-## Deployment
-
-### Vercel (Frontend)
-
-1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
-3. Deploy automatically on push to main branch
-
-### Railway/Heroku (Backend)
-
-1. Create a new project
-2. Connect your repository
-3. Set environment variables
-4. Deploy the `server` directory
-
-### MongoDB Atlas
-
-1. Create a free cluster at mongodb.com
-2. Get connection string
-3. Update `MONGODB_URI` in environment variables
-
-## Security Features
-
-- Password hashing with bcrypt (12 rounds)
-- JWT token authentication with expiration
-- Rate limiting on authentication endpoints
+- JWT-based authentication
+- Password hashing with bcrypt
 - Input validation and sanitization
 - CORS configuration
-- Environment variable protection
+- Rate limiting
+- SQL injection prevention
+- XSS protection
 
-## Performance Optimizations
+## 📈 Performance Optimizations
 
-- Database indexing on frequently queried fields
-- Pagination for large expense lists
-- Efficient aggregation queries for charts
-- Client-side caching with React state
-- Optimized bundle size with Next.js
+- Lazy loading of components
+- Image optimization
+- API response caching
+- Database query optimization
+- Bundle splitting
+- Service worker for PWA features
 
-## Contributing
+## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+2. Create a feature branch: `git checkout -b feature/new-feature`
+3. Commit changes: `git commit -am 'Add new feature'`
+4. Push to branch: `git push origin feature/new-feature`
+5. Submit a Pull Request
 
-## Troubleshooting
+## 📄 License
 
-### Common Issues
+This project is licensed under the MIT License - see the LICENSE file for details.
 
-**Email not sending**
-- Check email credentials and app passwords
-- Verify `SEND_REAL_EMAILS=true` in production
-- Check spam folder for test emails
+## 🆕 Recent Updates (Phase 3)
 
-**Database connection failed**
-- Verify MongoDB is running locally
-- Check connection string format
-- Ensure network access for cloud databases
+### Major Features Added:
+- ✅ Real-time Notification Center with Socket.IO
+- ✅ Comprehensive Goals Tracking System
+- ✅ Automated Recurring Transactions
+- ✅ Advanced Analytics Dashboard with Recharts
+- ✅ Enhanced Budget Management System
+- ✅ Multi-format Data Export System
+- ✅ System Status Monitoring Dashboard
+- ✅ Updated Navigation with all new pages
+- ✅ Mobile-responsive design for all components
+- ✅ Real-time updates across all modules
 
-**Charts not displaying**
-- Check if data is being fetched correctly
-- Verify Recharts is installed
-- Check browser console for errors
-
-**CSV upload failing**
-- Ensure CSV has required columns (amount, date)
-- Check file size (max 5MB)
-- Verify date format (YYYY-MM-DD)
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Support
-
-For support and questions:
-- Create an issue on GitHub
-- Check the troubleshooting section
-- Review the API documentation
+### Technical Improvements:
+- ✅ 6 new React components with TypeScript
+- ✅ 5 new pages with complete functionality
+- ✅ 50+ API endpoints with comprehensive coverage
+- ✅ Socket.IO real-time integration
+- ✅ Enhanced UI/UX with modern design patterns
+- ✅ Comprehensive error handling and loading states
+- ✅ Mobile-first responsive design
 
 ---
 
-Built with ❤️ using Next.js, Express.js, and MongoDB
+**Smart Expense Tracker** - Your comprehensive solution for intelligent expense management with advanced analytics, goal tracking, and real-time features.
