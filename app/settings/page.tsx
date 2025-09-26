@@ -188,10 +188,15 @@ export default function SettingsPage() {
     try {
       setSaving(true)
       
-      // Simulate saving settings
+      // Save currency to localStorage for now
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('userCurrency', settings.profile.currency)
+      }
+      
+      // Simulate saving other settings
       await new Promise(resolve => setTimeout(resolve, 1500))
       
-      toast.success('Settings saved successfully')
+      toast.success('Settings saved successfully! Currency changes will be reflected after page refresh.')
     } catch (error) {
       console.error('Error saving settings:', error)
       toast.error('Failed to save settings')
@@ -508,6 +513,7 @@ export default function SettingsPage() {
                           <SelectValue />
                         </SelectTrigger>
                         <SelectContent>
+                          <SelectItem value="INR">INR (₹)</SelectItem>
                           <SelectItem value="USD">USD ($)</SelectItem>
                           <SelectItem value="EUR">EUR (€)</SelectItem>
                           <SelectItem value="GBP">GBP (£)</SelectItem>

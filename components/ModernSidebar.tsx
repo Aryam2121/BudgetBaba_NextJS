@@ -30,11 +30,17 @@ import {
   RotateCcw,
   Download,
   Zap,
-  Activity
+  Activity,
+  ChevronLeft,
+  ChevronRight
 } from 'lucide-react'
 
 interface SidebarProps {
   className?: string
+  isCollapsed: boolean
+  isMobileMenuOpen: boolean
+  onToggle: () => void
+  onMobileMenuClose: () => void
 }
 
 const navigationItems = [
@@ -155,9 +161,13 @@ const navigationItems = [
   }
 ]
 
-export function ModernSidebar({ className }: SidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-  const [isMobileOpen, setIsMobileOpen] = useState(false)
+export function ModernSidebar({ 
+  className, 
+  isCollapsed, 
+  isMobileMenuOpen, 
+  onToggle, 
+  onMobileMenuClose 
+}: SidebarProps) {
   const pathname = usePathname()
   const { user, logout } = useAuth()
 
@@ -168,16 +178,16 @@ export function ModernSidebar({ className }: SidebarProps) {
         variant="ghost"
         size="sm"
         className="fixed top-4 left-4 z-50 md:hidden bg-white/90 backdrop-blur-sm shadow-lg"
-        onClick={() => setIsMobileOpen(!isMobileOpen)}
+        onClick={() => onToggle()}
       >
-        {isMobileOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+        {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </Button>
 
       {/* Mobile Overlay */}
-      {isMobileOpen && (
+      {isMobileMenuOpen && (
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
-          onClick={() => setIsMobileOpen(false)}
+          onClick={() => onMobileMenuClose()}
         />
       )}
 
@@ -186,7 +196,7 @@ export function ModernSidebar({ className }: SidebarProps) {
         className={cn(
           "fixed left-0 top-0 h-full bg-white/95 backdrop-blur-xl border-r border-slate-200/60 transition-all duration-300 z-50",
           isCollapsed ? "w-16" : "w-64",
-          isMobileOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
+          isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
           className
         )}
       >
@@ -208,10 +218,10 @@ export function ModernSidebar({ className }: SidebarProps) {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => setIsCollapsed(!isCollapsed)}
+                onClick={() => onToggle()}
                 className="hidden md:flex h-8 w-8 p-0"
               >
-                <Menu className="h-4 w-4" />
+                {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
               </Button>
             </div>
           </div>
@@ -247,7 +257,7 @@ export function ModernSidebar({ className }: SidebarProps) {
                     const isActive = pathname === item.href
                     return (
                       <li key={item.href}>
-                        <Link href={item.href} onClick={() => setIsMobileOpen(false)}>
+                        <Link href={item.href} onClick={() => onMobileMenuClose()}>
                           <Button
                             variant={isActive ? "secondary" : "ghost"}
                             className={cn(
@@ -334,9 +344,6 @@ export function ModernSidebar({ className }: SidebarProps) {
           </div>
         </div>
       </aside>
-
-      {/* Main Content Spacer */}
-      <div className={cn("hidden md:block transition-all duration-300", isCollapsed ? "w-16" : "w-64")} />
     </>
   )
 }

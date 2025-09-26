@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { DashboardLayout } from '@/components/DashboardLayout'
+import { formatCurrency } from '@/lib/currency'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -198,7 +199,7 @@ export default function ExpensesPage() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">All Expenses</h1>
               <p className="text-slate-600 mt-1 text-sm sm:text-base">
-                {loading ? 'Loading...' : `${filteredCount} expenses • Total: $${totalAmount.toFixed(2)}`}
+                {loading ? 'Loading...' : `${filteredCount} expenses • Total: ${formatCurrency(totalAmount, 'USD')}`}
               </p>
             </div>
             
@@ -238,7 +239,7 @@ export default function ExpensesPage() {
                   <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
                   <div className="ml-3 sm:ml-4 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Total Amount</p>
-                    <p className="text-lg sm:text-2xl font-bold text-slate-800">${totalAmount.toFixed(2)}</p>
+                                        <p className="text-lg sm:text-2xl font-bold text-slate-800">{formatCurrency(totalAmount, 'USD')}</p>
                   </div>
                 </div>
               </CardContent>
@@ -251,7 +252,7 @@ export default function ExpensesPage() {
                   <div className="ml-3 sm:ml-4 min-w-0">
                     <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Average</p>
                     <p className="text-lg sm:text-2xl font-bold text-slate-800">
-                      ${filteredCount > 0 ? (totalAmount / filteredCount).toFixed(2) : '0.00'}
+                      {filteredCount > 0 ? formatCurrency(totalAmount / filteredCount, 'USD') : formatCurrency(0, 'USD')}
                     </p>
                   </div>
                 </div>
@@ -422,7 +423,7 @@ export default function ExpensesPage() {
                               {expense.vendor || '-'}
                             </TableCell>
                             <TableCell className="text-right font-bold">
-                              ${expense.amount.toFixed(2)}
+                              {formatCurrency(expense.amount, 'USD')}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
@@ -497,7 +498,7 @@ export default function ExpensesPage() {
                             </div>
                             <div className="text-right">
                               <p className="font-bold text-lg text-slate-800">
-                                ${expense.amount.toFixed(2)}
+                                {formatCurrency(expense.amount, 'USD')}
                               </p>
                               <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
                                 {expense.category}

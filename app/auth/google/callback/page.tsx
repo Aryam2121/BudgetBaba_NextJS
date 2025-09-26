@@ -9,7 +9,7 @@ import { api } from '@/lib/api'
 export default function GoogleCallback() {
   const router = useRouter()
   const searchParams = useSearchParams()
-  const { login } = useAuth()
+  const { loginWithToken } = useAuth()
 
   useEffect(() => {
     const handleCallback = async () => {
@@ -38,8 +38,7 @@ export default function GoogleCallback() {
         }
 
         // Store token and user data
-        localStorage.setItem('token', response.data.token)
-        login(response.data.user, response.data.token)
+        loginWithToken(response.data.user, response.data.token)
 
         toast.success(`Welcome back, ${response.data.user.name}! 🎉`)
         
@@ -57,7 +56,7 @@ export default function GoogleCallback() {
     }
 
     handleCallback()
-  }, [searchParams, router, login])
+  }, [searchParams, router, loginWithToken])
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50">

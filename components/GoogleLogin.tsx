@@ -34,15 +34,15 @@ export function GoogleLogin() {
       onClick={handleGoogleLogin}
       disabled={isLoading}
       variant="outline"
-      className="w-full"
+      className="w-full h-11 border-2 border-gray-200 hover:border-gray-300 hover:bg-gray-50 transition-all duration-200 transform hover:scale-[1.02]"
     >
       {isLoading ? (
-        <div className="flex items-center space-x-2">
-          <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
-          <span>Connecting...</span>
+        <div className="flex items-center justify-center space-x-2">
+          <div className="w-5 h-5 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"></div>
+          <span className="text-gray-600">Connecting to Google...</span>
         </div>
       ) : (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-center space-x-3">
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
               fill="#4285F4"
@@ -61,7 +61,7 @@ export function GoogleLogin() {
               d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
             />
           </svg>
-          <span>Continue with Google</span>
+          <span className="text-gray-700 font-medium">Continue with Google</span>
         </div>
       )}
     </Button>

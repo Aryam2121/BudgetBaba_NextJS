@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { DashboardLayout } from '@/components/DashboardLayout'
+import { formatCurrency } from '@/lib/currency'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -299,7 +300,7 @@ ${reportData.topCategories.map(cat =>
 
 DETAILED TRANSACTIONS:
 ${reportData.expenses.map(expense => 
-  `${new Date(expense.date || expense.createdAt).toLocaleDateString()} - ${expense.description} - $${expense.amount} - ${expense.category}`
+  `${new Date(expense.date || expense.createdAt).toLocaleDateString()} - ${expense.description} - ${formatCurrency(expense.amount, 'USD')} - ${expense.category}`
 ).join('\n')}
 `
         mimeType = 'text/plain'
@@ -806,7 +807,7 @@ ${reportData.expenses.map(expense =>
                                     </Badge>
                                   </td>
                                   <td className="p-2 text-sm text-right font-medium">
-                                    ${(expense.amount || 0).toFixed(2)}
+                                    {formatCurrency(expense.amount || 0, 'USD')}
                                   </td>
                                 </tr>
                               ))}

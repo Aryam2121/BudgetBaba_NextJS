@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
 import { DashboardLayout } from "@/components/DashboardLayout"
+import { formatCurrency } from "@/lib/currency"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -89,7 +90,7 @@ const StatCard: React.FC<StatCardProps> = ({
   icon: Icon, 
   trend = "up", 
   className = "", 
-  prefix = "$", 
+  prefix = "", 
   suffix = "" 
 }) => (
   <Card className={`relative overflow-hidden bg-white/60 backdrop-blur-sm border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group ${className}`}>
@@ -380,14 +381,14 @@ export default function Dashboard() {
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
             <StatCard 
               title="Monthly Spending" 
-              value={isBalanceVisible ? stats.monthlySpent : "••••"} 
+              value={isBalanceVisible ? formatCurrency(stats.monthlySpent, 'USD') : "••••"} 
               change={Math.abs(stats.expenseChange || 0)} 
               icon={Wallet} 
               trend={(stats.expenseChange ?? 0) > 0 ? "up" : "down"} 
             />
             <StatCard 
               title="Remaining Budget" 
-              value={isBalanceVisible ? stats.remainingBudget : "••••"} 
+              value={isBalanceVisible ? formatCurrency(stats.remainingBudget, 'USD') : "••••"} 
               change={Math.abs(stats.savingsRate || 0)} 
               icon={Target} 
               trend={stats.remainingBudget > 0 ? "up" : "down"} 

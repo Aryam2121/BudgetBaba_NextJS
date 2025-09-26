@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { GoogleLogin } from "@/components/GoogleLogin"
 import { Loader2, Eye, EyeOff, User, Mail, Lock, CheckCircle } from "lucide-react"
 
 export default function RegisterPage() {
@@ -119,6 +120,19 @@ export default function RegisterPage() {
 
           <Card className="shadow-xl border-0">
             <CardContent className="p-8">
+              {/* Google OAuth */}
+              <GoogleLogin />
+              
+              {/* Divider */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-gray-300" />
+                </div>
+                <div className="relative flex justify-center text-sm">
+                  <span className="px-2 bg-white text-gray-500">or continue with email</span>
+                </div>
+              </div>
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 {error && (
                   <Alert variant="destructive" className="animate-in slide-in-from-top-2">

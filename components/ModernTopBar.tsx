@@ -26,6 +26,8 @@ import {
 
 interface TopBarProps {
   className?: string
+  isSidebarCollapsed: boolean
+  onMobileMenuToggle: () => void
 }
 
 const pathLabels: Record<string, string> = {
@@ -48,7 +50,7 @@ const pathLabels: Record<string, string> = {
   '/help': 'Help & Support'
 }
 
-export function ModernTopBar({ className }: TopBarProps) {
+export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [notifications] = useState([
     { id: 1, message: 'New expense split request from John', unread: true },

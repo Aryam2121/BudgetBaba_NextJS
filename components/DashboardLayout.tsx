@@ -1,6 +1,6 @@
 "use client"
 
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import { ModernSidebar } from '@/components/ModernSidebar'
 import { ModernTopBar } from '@/components/ModernTopBar'
 import { cn } from '@/lib/utils'
@@ -18,23 +18,54 @@ export function DashboardLayout({
   showSidebar = true,
   showTopBar = true
 }: DashboardLayoutProps) {
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Sidebar */}
-      {showSidebar && <ModernSidebar />}
+      {showSidebar && (
+        <ModernSidebar 
+          isCollapsed={isSidebarCollapsed}
+          isMobileMenuOpen={isMobileMenuOpen}
+          onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onMobileMenuClose={() => setIsMobileMenuOpen(false)}
+        />
+      )}
       
-      {/* Main Content Area */}
-      <div className={cn("flex flex-col min-h-screen", showSidebar && "md:pl-64")}>
+      {/* Main Content Area - Adjusts based on sidebar state */}
+      <div className={cn(
+        "flex flex-col min-h-screen transition-all duration-300 ease-in-out",
+        showSidebar && !isSidebarCollapsed && "md:pl-64", // Full sidebar width
+        showSidebar && isSidebarCollapsed && "md:pl-16",  // Collapsed sidebar width
+        !showSidebar && "pl-0" // No sidebar
+      )}>
         {/* Top Bar */}
-        {showTopBar && <ModernTopBar />}
+        {showTopBar && (
+          <ModernTopBar 
+            isSidebarCollapsed={isSidebarCollapsed}
+            onMobileMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+          />
+        )}
         
-        {/* Page Content */}
+        {/* Page Content - Full width when sidebar collapsed */}
         <main className={cn("flex-1 p-6", className)}>
-          <div className="max-w-7xl mx-auto">
+          <div className={cn(
+            "mx-auto transition-all duration-300 ease-in-out",
+            isSidebarCollapsed ? "max-w-none" : "max-w-7xl"
+          )}>
             {children}
           </div>
         </main>
       </div>
+
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 md:hidden"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
     </div>
   )
 }
