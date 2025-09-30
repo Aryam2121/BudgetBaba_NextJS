@@ -1,0 +1,72 @@
+<svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#gradient)" />
+  
+  <!-- Wise Character Head -->
+  <circle cx="256" cy="192" r="76" fill="white" fill-opacity="0.98" stroke="#E5E7EB" stroke-width="3" />
+  
+  <!-- Mustache (Baba Style) -->
+  <path d="M190 213C203 222 222 222 235 213C235 213 243 222 256 222C269 222 277 213 277 213C290 222 309 222 322 213" 
+        stroke="#8B5CF6" 
+        stroke-width="12" 
+        stroke-linecap="round" 
+        fill="none" />
+  
+  <!-- Eyes -->
+  <circle cx="230" cy="178" r="8" fill="#1F2937" />
+  <circle cx="282" cy="178" r="8" fill="#1F2937" />
+  
+  <!-- Wise Cap/Turban -->
+  <path d="M180 149C180 106 213 85 256 85C299 85 332 106 332 149L320 170L192 170Z" 
+        fill="#8B5CF6" 
+        fill-opacity="0.95" 
+        stroke="#7C3AED" 
+        stroke-width="2" />
+  
+  <!-- Decorative Gem on Cap -->
+  <circle cx="256" cy="120" r="12" fill="#F59E0B" />
+  <circle cx="256" cy="120" r="6" fill="#FCD34D" />
+  
+  <!-- Money/Coins floating around -->
+  <circle cx="128" cy="128" r="25" fill="#F59E0B" fill-opacity="0.9" stroke="#D97706" stroke-width="2" />
+  <text x="128" y="140" text-anchor="middle" font-family="Arial" font-size="24" fill="white" font-weight="bold">₹</text>
+  
+  <circle cx="384" cy="149" r="25" fill="#F59E0B" fill-opacity="0.9" stroke="#D97706" stroke-width="2" />
+  <text x="384" y="161" text-anchor="middle" font-family="Arial" font-size="24" fill="white" font-weight="bold">$</text>
+  
+  <circle cx="106" cy="362" r="25" fill="#F59E0B" fill-opacity="0.9" stroke="#D97706" stroke-width="2" />
+  <text x="106" y="374" text-anchor="middle" font-family="Arial" font-size="24" fill="white" font-weight="bold">€</text>
+  
+  <circle cx="406" cy="362" r="25" fill="#F59E0B" fill-opacity="0.9" stroke="#D97706" stroke-width="2" />
+  <text x="406" y="374" text-anchor="middle" font-family="Arial" font-size="24" fill="white" font-weight="bold">¥</text>
+  
+  <!-- Ledger/Book -->
+  <rect x="149" y="298" width="214" height="149" rx="17" fill="white" fill-opacity="0.98" stroke="#8B5CF6" stroke-width="6" />
+  
+  <!-- Book Lines -->
+  <line x1="170" y1="332" x2="320" y2="332" stroke="#8B5CF6" stroke-width="6" />
+  <line x1="170" y1="362" x2="298" y2="362" stroke="#10B981" stroke-width="6" />
+  <line x1="170" y1="392" x2="341" y2="392" stroke="#EF4444" stroke-width="6" />
+  <line x1="170" y1="422" x2="277" y2="422" stroke="#8B5CF6" stroke-width="6" />
+  
+  <!-- Wisdom Sparkles -->
+  <path d="M405 298L415 308L405 318L395 308Z" fill="#F59E0B" />
+  <path d="M85 256L95 266L85 276L75 266Z" fill="#F59E0B" />
+  <path d="M362 384L372 394L362 404L352 394Z" fill="#F59E0B" />
+  <path d="M64 192L74 202L64 212L54 202Z" fill="#F59E0B" />
+  <path d="M448 213L458 223L448 233L438 223Z" fill="#F59E0B" />
+  
+  <!-- Additional Wisdom Elements -->
+  <circle cx="427" cy="128" r="4" fill="#F59E0B" />
+  <circle cx="85" cy="320" r="4" fill="#F59E0B" />
+  <circle cx="149" cy="85" r="4" fill="#F59E0B" />
+  
+  <!-- Gradient Definition -->
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8B5CF6;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#7C3AED;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6D28D9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+</svg>

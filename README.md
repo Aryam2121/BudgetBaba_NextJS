@@ -1,4 +1,4 @@
-# Smart Expense Tracker
+# Budget Baba
 
 A comprehensive full-stack expense tracking application with advanced analytics, goal tracking, automated recurring transactions, real-time notifications, and intelligent expense management.
 
@@ -317,4 +317,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ---
 
-**Smart Expense Tracker** - Your comprehensive solution for intelligent expense management with advanced analytics, goal tracking, and real-time features.
+**Budget Baba** - Your comprehensive solution for intelligent expense management with advanced analytics, goal tracking, and real-time features.

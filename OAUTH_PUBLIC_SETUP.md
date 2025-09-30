@@ -18,7 +18,7 @@ Your app is currently in "Testing" mode, which means only approved test users ca
 
 3. **Required Information for Verification**
    ```
-   App Name: Smart Expense Tracker
+   App Name: Budget Baba
    User Support Email: your-email@gmail.com
    App Logo: [Optional but recommended]
    App Domain: your-domain.com (if you have one)

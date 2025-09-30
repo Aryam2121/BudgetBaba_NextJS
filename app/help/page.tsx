@@ -167,7 +167,7 @@ export default function HelpPage() {
   const tutorials: Tutorial[] = [
     {
       id: 'tut-1',
-      title: 'Getting Started with Smart Expense Tracker',
+      title: 'Getting Started with Budget Baba',
       description: 'Learn the basics of adding expenses, creating categories, and navigating the dashboard.',
       duration: '5 min',
       level: 'beginner',

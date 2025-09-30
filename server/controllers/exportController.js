@@ -405,7 +405,7 @@ const exportAllData = async (req, res) => {
 
       // Add summary file
       zip.file('export-summary.txt', 
-        `Smart Expense Tracker - Complete Data Export
+        `Budget Baba - Complete Data Export
 Export Date: ${allData.exportDate}
 User ID: ${userId}
 

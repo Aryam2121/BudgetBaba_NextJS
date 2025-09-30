@@ -93,12 +93,12 @@ const StatCard: React.FC<StatCardProps> = ({
   prefix = "", 
   suffix = "" 
 }) => (
-  <Card className={`relative overflow-hidden bg-white/60 backdrop-blur-sm border-white/20 shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group ${className}`}>
+  <Card className={`relative overflow-hidden bg-card backdrop-blur-sm border-border shadow-xl hover:shadow-2xl transition-all duration-500 hover:scale-105 group ${className}`}>
     {/* Animated Background Gradient */}
     <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-purple-500/5 to-pink-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
     
     <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-      <CardTitle className="text-sm font-medium text-slate-600 group-hover:text-slate-800 transition-colors">
+      <CardTitle className="text-sm font-medium text-muted-foreground group-hover:text-foreground transition-colors">
         {title}
       </CardTitle>
       <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
@@ -108,7 +108,7 @@ const StatCard: React.FC<StatCardProps> = ({
       </div>
     </CardHeader>
     <CardContent className="relative z-10">
-      <div className="text-2xl font-bold text-slate-800 group-hover:text-slate-900 transition-colors">
+      <div className="text-2xl font-bold text-foreground group-hover:text-foreground transition-colors">
         {prefix}{typeof value === 'number' ? value.toLocaleString() : value}{suffix}
       </div>
       <div className="flex items-center space-x-1 mt-1">
@@ -265,14 +265,14 @@ export default function Dashboard() {
   const StatsSkeleton = () => (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {[...Array(4)].map((_, i) => (
-        <Card key={i} className="bg-white/60 backdrop-blur-sm">
+        <Card key={i} className="bg-card backdrop-blur-sm">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <div className="h-4 bg-slate-200 rounded w-24 animate-pulse" />
-            <div className="h-10 w-10 bg-slate-200 rounded-full animate-pulse" />
+            <div className="h-4 bg-muted rounded w-24 animate-pulse" />
+            <div className="h-10 w-10 bg-muted rounded-full animate-pulse" />
           </CardHeader>
           <CardContent>
-            <div className="h-8 bg-slate-200 rounded w-20 animate-pulse mb-2" />
-            <div className="h-4 bg-slate-200 rounded w-32 animate-pulse" />
+            <div className="h-8 bg-muted rounded w-20 animate-pulse mb-2" />
+            <div className="h-4 bg-muted rounded w-32 animate-pulse" />
           </CardContent>
         </Card>
       ))}
@@ -282,13 +282,13 @@ export default function Dashboard() {
   const ExpenseSkeleton = () => (
     <div className="space-y-3">
       {[...Array(5)].map((_, i) => (
-        <div key={i} className="flex items-center space-x-3 p-3 bg-white/40 rounded-lg animate-pulse">
-          <div className="h-10 w-10 bg-slate-200 rounded-full" />
+        <div key={i} className="flex items-center space-x-3 p-3 bg-muted/40 rounded-lg animate-pulse">
+          <div className="h-10 w-10 bg-muted rounded-full" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 bg-slate-200 rounded w-3/4" />
-            <div className="h-3 bg-slate-200 rounded w-1/2" />
+            <div className="h-4 bg-muted rounded w-3/4" />
+            <div className="h-3 bg-muted rounded w-1/2" />
           </div>
-          <div className="h-6 bg-slate-200 rounded w-16" />
+          <div className="h-6 bg-muted rounded w-16" />
         </div>
       ))}
     </div>
@@ -301,10 +301,10 @@ export default function Dashboard() {
         <div className="mb-8">
           <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-2">
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
                 Welcome back, {user?.name?.split(' ')[0] || 'there'}! 👋
               </h1>
-              <p className="text-slate-600 text-sm sm:text-base">
+              <p className="text-muted-foreground text-sm sm:text-base">
                 Here's what's happening with your expenses today.
               </p>
             </div>
@@ -417,7 +417,7 @@ export default function Dashboard() {
         {/* Main Content Tabs */}
         <Tabs defaultValue="overview" className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <TabsList className="bg-white/60 backdrop-blur-sm w-full sm:w-auto overflow-x-auto">
+            <TabsList className="bg-card/60 backdrop-blur-sm w-full sm:w-auto overflow-x-auto">
               <TabsTrigger value="overview" className="flex-1 sm:flex-none">Overview</TabsTrigger>
               <TabsTrigger value="expenses" className="flex-1 sm:flex-none">Expenses</TabsTrigger>
               <TabsTrigger value="splits" className="flex-1 sm:flex-none">Splits</TabsTrigger>
@@ -449,7 +449,7 @@ export default function Dashboard() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid gap-6 grid-cols-1 lg:grid-cols-2">
               {/* Quick Stats */}
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="bg-card/60 backdrop-blur-sm border-border shadow-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <PieChart className="h-5 w-5 text-blue-500" />
@@ -459,20 +459,20 @@ export default function Dashboard() {
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Avg Daily Spend</span>
-                      <span className="font-medium">${isBalanceVisible ? stats.avgDailySpend : '••••'}</span>
+                      <span className="text-sm text-muted-foreground">Avg Daily Spend</span>
+                      <span className="font-medium text-foreground">${isBalanceVisible ? stats.avgDailySpend : '••••'}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Categories Used</span>
-                      <span className="font-medium">{stats.categoriesCount}</span>
+                      <span className="text-sm text-muted-foreground">Categories Used</span>
+                      <span className="font-medium text-foreground">{stats.categoriesCount}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Pending Splits</span>
+                      <span className="text-sm text-muted-foreground">Pending Splits</span>
                       <Badge variant="outline">{stats.pendingSplits}</Badge>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm text-slate-600">Budget Progress</span>
-                      <span className="font-medium">
+                      <span className="text-sm text-muted-foreground">Budget Progress</span>
+                      <span className="font-medium text-foreground">
                         {stats.monthlySpent && user?.monthlyBudget ? 
                           Math.round((stats.monthlySpent / user.monthlyBudget) * 100) : 71
                         }%
@@ -497,7 +497,7 @@ export default function Dashboard() {
               </Card>
 
               {/* Quick Actions */}
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="bg-card/60 backdrop-blur-sm border-border shadow-xl">
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
                     <Zap className="h-5 w-5 text-purple-500" />
@@ -533,9 +533,9 @@ export default function Dashboard() {
                   </div>
                   
                   {/* Recent Activity Summary */}
-                  <div className="mt-6 pt-4 border-t border-slate-200">
-                    <h4 className="text-sm font-medium mb-3 text-slate-700">Recent Activity</h4>
-                    <div className="space-y-2 text-sm text-slate-600">
+                  <div className="mt-6 pt-4 border-t border-border">
+                    <h4 className="text-sm font-medium mb-3 text-foreground">Recent Activity</h4>
+                    <div className="space-y-2 text-sm text-muted-foreground">
                       <div className="flex items-center justify-between">
                         <span>Today's expenses</span>
                         <Badge variant="secondary">
@@ -546,7 +546,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span>This week</span>
-                        <span className="font-medium">
+                        <span className="font-medium text-foreground">
                           {recentExpenses.filter(e => {
                             const expenseDate = new Date(e.date)
                             const weekAgo = new Date()
@@ -557,7 +557,7 @@ export default function Dashboard() {
                       </div>
                       <div className="flex items-center justify-between">
                         <span>Active splits</span>
-                        <span className="font-medium">{stats.pendingSplits}</span>
+                        <span className="font-medium text-foreground">{stats.pendingSplits}</span>
                       </div>
                     </div>
                   </div>
@@ -567,7 +567,7 @@ export default function Dashboard() {
 
             {/* Charts Row */}
             <div className="grid gap-6 grid-cols-1 xl:grid-cols-2">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="bg-card/60 backdrop-blur-sm border-border shadow-xl">
                 <CardHeader>
                   <CardTitle>Expense Trends</CardTitle>
                   <CardDescription>Your spending over time</CardDescription>
@@ -576,7 +576,7 @@ export default function Dashboard() {
                   {chartData.monthlyTrends.length > 0 ? (
                     <ExpenseLineChart data={chartData.monthlyTrends} />
                   ) : (
-                    <div className="h-64 flex items-center justify-center text-slate-500">
+                    <div className="h-64 flex items-center justify-center text-muted-foreground">
                       <div className="text-center">
                         <PieChart className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>No trend data available</p>
@@ -586,7 +586,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="bg-card/60 backdrop-blur-sm border-border shadow-xl">
                 <CardHeader>
                   <CardTitle>Category Breakdown</CardTitle>
                   <CardDescription>Where your money goes</CardDescription>
@@ -595,7 +595,7 @@ export default function Dashboard() {
                   {chartData.categoryTotals.length > 0 ? (
                     <ExpensePieChart data={chartData.categoryTotals} />
                   ) : (
-                    <div className="h-64 flex items-center justify-center text-slate-500">
+                    <div className="h-64 flex items-center justify-center text-muted-foreground">
                       <div className="text-center">
                         <PieChart className="h-8 w-8 mx-auto mb-2 opacity-50" />
                         <p>No category data available</p>
@@ -609,7 +609,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="expenses" className="space-y-6">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+            <Card className="bg-card/60 backdrop-blur-sm border-border shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Recent Expenses</CardTitle>
@@ -634,9 +634,9 @@ export default function Dashboard() {
                   <ExpenseSkeleton />
                 ) : recentExpenses.length === 0 ? (
                   <div className="text-center py-8">
-                    <Receipt className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">No expenses yet</h3>
-                    <p className="text-slate-500 mb-4">Start tracking your expenses to see them here</p>
+                    <Receipt className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                    <h3 className="text-lg font-medium text-muted-foreground mb-2">No expenses yet</h3>
+                    <p className="text-muted-foreground mb-4">Start tracking your expenses to see them here</p>
                     <Link href="/expenses/new">
                       <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
                         <Plus className="h-4 w-4 mr-2" />
@@ -649,7 +649,7 @@ export default function Dashboard() {
                     {recentExpenses.map((expense, index) => (
                       <div
                         key={expense.id}
-                        className="flex items-center justify-between p-4 rounded-lg bg-white/40 hover:bg-white/60 transition-all duration-200 group cursor-pointer"
+                        className="flex items-center justify-between p-4 rounded-lg bg-card/40 hover:bg-card/60 border border-border/50 transition-all duration-200 group cursor-pointer"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -662,21 +662,21 @@ export default function Dashboard() {
                             }
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-medium text-slate-800 group-hover:text-slate-900 truncate">
+                            <p className="font-medium text-foreground group-hover:text-foreground/90 truncate">
                               {expense.description}
                             </p>
                             <div className="flex items-center space-x-2 mt-1">
                               <Badge variant="secondary" className="text-xs">
                                 {expense.category}
                               </Badge>
-                              <span className="text-sm text-slate-500">•</span>
-                              <span className="text-sm text-slate-500">{expense.date}</span>
+                              <span className="text-sm text-muted-foreground">•</span>
+                              <span className="text-sm text-muted-foreground">{expense.date}</span>
                             </div>
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
                           <span className={`font-semibold text-lg ${
-                            expense.type === 'income' ? 'text-green-600' : 'text-slate-800'
+                            expense.type === 'income' ? 'text-green-600' : 'text-foreground'
                           }`}>
                             {expense.type === 'income' ? '+' : '-'}${expense.amount.toFixed(2)}
                           </span>
@@ -701,7 +701,7 @@ export default function Dashboard() {
           </TabsContent>
 
           <TabsContent value="splits" className="space-y-6">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+            <Card className="bg-card/60 backdrop-blur-sm border-border shadow-xl">
               <CardHeader className="flex flex-row items-center justify-between">
                 <div>
                   <CardTitle>Expense Splits</CardTitle>
@@ -726,9 +726,9 @@ export default function Dashboard() {
                   <ExpenseSkeleton />
                 ) : recentSplits.length === 0 ? (
                   <div className="text-center py-8">
-                    <Users className="h-12 w-12 mx-auto text-slate-300 mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">No splits yet</h3>
-                    <p className="text-slate-500 mb-4">Share expenses with friends and family</p>
+                    <Users className="h-12 w-12 mx-auto text-muted-foreground/30 mb-4" />
+                    <h3 className="text-lg font-medium text-muted-foreground mb-2">No splits yet</h3>
+                    <p className="text-muted-foreground mb-4">Share expenses with friends and family</p>
                     <Link href="/splits">
                       <Button className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
                         <Users className="h-4 w-4 mr-2" />

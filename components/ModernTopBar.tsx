@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useTheme } from 'next-themes'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
@@ -52,6 +53,7 @@ const pathLabels: Record<string, string> = {
 
 export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle }: TopBarProps) {
   const [searchQuery, setSearchQuery] = useState('')
+  const [mounted, setMounted] = useState(false)
   const [notifications] = useState([
     { id: 1, message: 'New expense split request from John', unread: true },
     { id: 2, message: 'Monthly budget limit reached', unread: true },
@@ -60,6 +62,11 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
   
   const pathname = usePathname()
   const { user } = useAuth()
+  const { theme, setTheme } = useTheme()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   // Generate breadcrumbs from pathname
   const breadcrumbs = pathname.split('/').filter(Boolean).map((segment, index, arr) => {
@@ -80,7 +87,7 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
 
   return (
     <header className={cn(
-      "sticky top-0 z-40 w-full bg-white/95 backdrop-blur-xl border-b border-slate-200/60",
+      "sticky top-0 z-40 w-full bg-background/95 backdrop-blur-xl border-b border-border",
       className
     )}>
       <div className="flex h-16 items-center justify-between px-6">
@@ -90,19 +97,19 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
           <nav className="flex items-center space-x-1 text-sm">
             <Link 
               href="/dashboard"
-              className="flex items-center text-slate-500 hover:text-slate-700 transition-colors"
+              className="flex items-center text-muted-foreground hover:text-foreground transition-colors"
             >
               <Home className="h-4 w-4" />
             </Link>
             {breadcrumbs.map((crumb, index) => (
               <div key={crumb.href} className="flex items-center space-x-1">
-                <ChevronRight className="h-4 w-4 text-slate-400" />
+                <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 {crumb.isLast ? (
-                  <span className="font-medium text-slate-800">{crumb.label}</span>
+                  <span className="font-medium text-foreground">{crumb.label}</span>
                 ) : (
                   <Link 
                     href={crumb.href}
-                    className="text-slate-500 hover:text-slate-700 transition-colors"
+                    className="text-muted-foreground hover:text-foreground transition-colors"
                   >
                     {crumb.label}
                   </Link>
@@ -115,13 +122,13 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
         {/* Center Section - Search */}
         <div className="flex items-center flex-1 max-w-md mx-8">
           <div className="relative w-full">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search expenses, categories, splits..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
             />
           </div>
         </div>
@@ -168,8 +175,17 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
           </Link>
 
           {/* Theme Toggle */}
-          <Button variant="ghost" size="sm" className="p-2">
-            <Sun className="h-5 w-5" />
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="p-2"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          >
+            {mounted && theme === 'dark' ? (
+              <Sun className="h-5 w-5" />
+            ) : (
+              <Moon className="h-5 w-5" />
+            )}
           </Button>
 
           {/* Settings */}
@@ -180,10 +196,10 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
           </Link>
 
           {/* User Profile */}
-          <div className="flex items-center space-x-3 pl-3 border-l border-slate-200">
+          <div className="flex items-center space-x-3 pl-3 border-l border-border">
             <div className="hidden md:block text-right">
-              <p className="text-sm font-medium text-slate-800">{user?.name || 'User'}</p>
-              <p className="text-xs text-slate-500">{user?.email || 'user@email.com'}</p>
+              <p className="text-sm font-medium text-foreground">{user?.name || 'User'}</p>
+              <p className="text-xs text-muted-foreground">{user?.email || 'user@email.com'}</p>
             </div>
             <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
               <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-xs">
@@ -197,20 +213,20 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
       {/* Mobile Search Bar */}
       <div className="md:hidden px-6 pb-4">
         <div className="relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <input
             type="text"
             placeholder="Search..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-4 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full pl-10 pr-4 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
           />
         </div>
       </div>
 
       {/* Page Actions Bar */}
       {pathname === '/expenses' && (
-        <div className="border-t border-slate-200/60 px-6 py-3">
+        <div className="border-t border-border px-6 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               <Button variant="outline" size="sm">

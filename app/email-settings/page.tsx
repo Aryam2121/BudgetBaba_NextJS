@@ -737,7 +737,7 @@ export default function EmailSettingsPage() {
                         id="signature"
                         value={settings.emailConfig.emailSignature}
                         onChange={(e) => updateEmailConfig('emailSignature', e.target.value)}
-                        placeholder="Best regards,&#10;Smart Expense Tracker&#10;&#10;This is an automated email. Please do not reply."
+                        placeholder="Best regards,&#10;Budget Baba&#10;&#10;This is an automated email. Please do not reply."
                         rows={6}
                       />
                       <p className="text-xs text-slate-500">

@@ -1,6 +1,6 @@
 # Google OAuth Setup Guide
 
-This guide will help you set up Google OAuth for both login authentication and Gmail API integration in the Smart Expense Tracker app.
+This guide will help you set up Google OAuth for both login authentication and Gmail API integration in the Budget Baba app.
 
 ## Prerequisites
 
@@ -25,7 +25,7 @@ This guide will help you set up Google OAuth for both login authentication and G
 1. Go to "APIs & Services" > "OAuth consent screen"
 2. Choose "External" user type (unless you have a Google Workspace)
 3. Fill in the required information:
-   - **App name**: Smart Expense Tracker
+   - **App name**: Budget Baba
    - **User support email**: Your email
    - **Developer contact information**: Your email
 4. Add the following scopes:
@@ -40,7 +40,7 @@ This guide will help you set up Google OAuth for both login authentication and G
 1. Go to "APIs & Services" > "Credentials"
 2. Click "Create Credentials" > "OAuth 2.0 Client IDs"
 3. Choose "Web application" as the application type
-4. Set the name to "Smart Expense Tracker Web Client"
+4. Set the name to "Budget Baba Web Client"
 5. Add Authorized JavaScript origins:
    - `http://localhost:3000` (for development)
    - Your production domain when deploying

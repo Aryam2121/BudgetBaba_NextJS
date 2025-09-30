@@ -48,7 +48,7 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-center space-y-8">
           <div className="space-y-4">
             <h1 className="text-4xl font-bold tracking-tight">
-              Smart Expense Tracker
+              Budget Baba
             </h1>
             <p className="text-xl text-blue-100">
               Take control of your finances with intelligent expense tracking and budgeting

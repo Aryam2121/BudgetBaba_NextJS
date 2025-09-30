@@ -15,7 +15,7 @@ The "Access blocked" error occurs because your Google OAuth app hasn't completed
 1. Go to "APIs & Services" > "OAuth consent screen"
 2. Choose "External" user type (for testing with real Gmail accounts)
 3. Fill in the required fields:
-   - **App name**: Smart Expense Tracker
+   - **App name**: Budget Baba
    - **User support email**: Your email address
    - **Developer contact email**: Your email address
    - **App domain** (optional for testing)

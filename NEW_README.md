@@ -1,4 +1,4 @@
-# 🚀 Smart Expense Tracker
+# 🚀 Budget Baba
 
 A comprehensive, full-stack expense management application built with modern technologies. Track expenses, manage budgets, set financial goals, handle recurring transactions, and get intelligent insights to optimize your financial health.
 

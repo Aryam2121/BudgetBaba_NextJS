@@ -241,7 +241,7 @@ class PersonalEmailService {
       });
 
       // Use sender's name and email for better personalization
-      const fromName = senderUser ? senderUser.name : 'Smart Expense Tracker';
+      const fromName = senderUser ? senderUser.name : 'Budget Baba';
       const replyToEmail = senderUser ? senderUser.email : (process.env.MAIL_FROM || process.env.MAIL_USER);
       const fromAddress = `${fromName} <${process.env.MAIL_FROM || process.env.MAIL_USER}>`;
 

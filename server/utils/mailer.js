@@ -83,7 +83,7 @@ class MailService {
         }
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
-          This is an automated notification from your Smart Expense Tracker.
+          This is an automated notification from your Budget Baba.
         </p>
       </div>
     `
@@ -184,7 +184,7 @@ class MailService {
         </div>
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
-          This is your weekly summary from Smart Expense Tracker.
+          This is your weekly summary from Budget Baba.
         </p>
       </div>
     `
@@ -257,7 +257,7 @@ class MailService {
         }
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
-          This is an automated budget alert from your Smart Expense Tracker.
+          This is an automated budget alert from your Budget Baba.
         </p>
       </div>
     `
@@ -349,7 +349,7 @@ class MailService {
         }
 
         <p style="color: #6b7280; font-size: 14px; margin-top: 30px;">
-          This is an automated notification from your Smart Expense Tracker.
+          This is an automated notification from your Budget Baba.
         </p>
       </div>
     `

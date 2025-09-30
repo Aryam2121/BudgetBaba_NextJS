@@ -1,6 +1,6 @@
 # 📧 Email Setup Guide for Split Notifications
 
-Your Smart Expense Tracker is now configured to send email notifications when expenses are split. Here's how to track and enable email sending:
+Your Budget Baba is now configured to send email notifications when expenses are split. Here's how to track and enable email sending:
 
 ## 🔍 How to Monitor Email Sending
 

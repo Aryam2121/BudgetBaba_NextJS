@@ -1,6 +1,6 @@
 @echo off
 echo ====================================
-echo  Smart Expense Tracker - Full Setup
+echo  Budget Baba - Full Setup
 echo ====================================
 echo.
 

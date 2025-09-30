@@ -32,7 +32,7 @@ export default function HomePage() {
               <DollarSign className="h-6 w-6 text-white" />
             </div>
             <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Smart Expense Tracker
+              Budget Baba
             </span>
           </div>
           <div className="space-x-4">
