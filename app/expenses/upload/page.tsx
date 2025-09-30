@@ -9,9 +9,24 @@ import { DashboardLayout } from "@/components/DashboardLayout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { useToast } from "@/hooks/use-toast"
 import { api } from "@/lib/api"
-import { Loader2, ArrowLeft, Upload, FileText, CheckCircle } from "lucide-react"
+import { 
+  Loader2, 
+  ArrowLeft, 
+  Upload, 
+  FileText, 
+  CheckCircle, 
+  CloudUpload,
+  Database,
+  Download,
+  FileSpreadsheet,
+  AlertCircle,
+  Zap,
+  Clock,
+  Users
+} from "lucide-react"
 import Link from "next/link"
 
 export default function UploadExpensesPage() {
@@ -198,32 +213,130 @@ export default function UploadExpensesPage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        <div className="max-w-2xl mx-auto">
-          <div className="mb-6">
-            <h1 className="text-3xl font-bold text-slate-800 mb-2">Upload Expenses</h1>
-            <p className="text-slate-600">Upload a CSV file to import multiple expenses at once</p>
+        {/* Enhanced Header with gradient background */}
+        <div className="mb-8 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 via-blue-500/10 to-purple-500/10 rounded-2xl"></div>
+          <div className="relative p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
+            <div className="flex items-center justify-between">
+              <div className="space-y-3">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-gradient-to-br from-green-500 to-blue-600 rounded-xl shadow-lg">
+                    <CloudUpload className="h-8 w-8 text-white" />
+                  </div>
+                  <div>
+                    <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                      Upload Expenses
+                    </h1>
+                    <p className="text-slate-600 text-lg">
+                      Import multiple expenses from CSV files with smart mapping
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Quick Info Cards */}
+                <div className="flex flex-wrap gap-3 mt-6">
+                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                    <Upload className="h-4 w-4 mr-2" />
+                    Bulk Import
+                  </Badge>
+                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1">
+                    <Database className="h-4 w-4 mr-2" />
+                    Smart Mapping
+                  </Badge>
+                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1">
+                    <Zap className="h-4 w-4 mr-2" />
+                    Auto-categorization
+                  </Badge>
+                </div>
+              </div>
+              
+              {/* Visual elements */}
+              <div className="hidden lg:flex items-center space-x-4">
+                <div className="p-4 bg-gradient-to-br from-green-400 to-emerald-500 rounded-2xl shadow-lg transform rotate-12">
+                  <FileSpreadsheet className="h-12 w-12 text-white" />
+                </div>
+                <div className="p-4 bg-gradient-to-br from-blue-400 to-cyan-500 rounded-2xl shadow-lg transform -rotate-6">
+                  <Database className="h-12 w-12 text-white" />
+                </div>
+              </div>
+            </div>
           </div>
+        </div>
 
+        {/* Upload Features */}
+        <div className="grid gap-4 md:grid-cols-3 mb-8">
+          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <Clock className="h-8 w-8 text-blue-600 mx-auto mb-3" />
+              <h3 className="font-semibold text-slate-800 mb-2">Save Time</h3>
+              <p className="text-sm text-slate-600">Import hundreds of expenses in seconds</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <Database className="h-8 w-8 text-green-600 mx-auto mb-3" />
+              <h3 className="font-semibold text-slate-800 mb-2">Smart Detection</h3>
+              <p className="text-sm text-slate-600">Automatically detect column formats</p>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-300">
+            <CardContent className="p-6 text-center">
+              <Users className="h-8 w-8 text-purple-600 mx-auto mb-3" />
+              <h3 className="font-semibold text-slate-800 mb-2">Team Ready</h3>
+              <p className="text-sm text-slate-600">Support for multiple expense formats</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="max-w-2xl mx-auto">
           <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
             <CardHeader>
-              <CardTitle className="text-2xl">CSV File Upload</CardTitle>
-              <CardDescription>Select your CSV file and preview before importing</CardDescription>
+              <div className="flex items-center space-x-3">
+                <div className="p-2 bg-green-100 rounded-lg">
+                  <FileSpreadsheet className="h-6 w-6 text-green-600" />
+                </div>
+                <div>
+                  <CardTitle className="text-2xl">CSV File Upload</CardTitle>
+                  <CardDescription>Select your CSV file and preview before importing</CardDescription>
+                </div>
+              </div>
             </CardHeader>
             <CardContent className="space-y-6">
               {/* CSV Format Guide */}
-              <Alert>
-                <FileText className="h-4 w-4" />
+              <Alert className="bg-amber-50 border-amber-200">
+                <AlertCircle className="h-4 w-4 text-amber-600" />
                 <AlertDescription>
-                  <strong>CSV Format:</strong> Your file should have columns for amount, date, vendor (optional), and
+                  <strong className="text-amber-800">CSV Format:</strong> <span className="text-amber-700">Your file should have columns for amount, date, vendor (optional), and
                   note (optional). Common column names like "cost", "price", "store", "merchant", "description" are
-                  automatically recognized.
+                  automatically recognized.</span>
                 </AlertDescription>
               </Alert>
 
+              {/* Sample CSV Download */}
+              <Card className="bg-blue-50 border-blue-200">
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <Download className="h-5 w-5 text-blue-600" />
+                      <div>
+                        <h4 className="font-medium text-blue-800">Need a template?</h4>
+                        <p className="text-sm text-blue-600">Download our sample CSV file to get started</p>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="border-blue-300 text-blue-700 hover:bg-blue-100">
+                      <Download className="h-4 w-4 mr-2" />
+                      Sample CSV
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+
               {/* File Upload */}
               <div className="space-y-4">
-                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-                  <Upload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+                <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-blue-400 transition-colors">
+                  <CloudUpload className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                   <div className="space-y-2">
                     <p className="text-sm text-gray-600">Choose a CSV file or drag and drop it here</p>
                     <input
