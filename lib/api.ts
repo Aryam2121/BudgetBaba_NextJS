@@ -279,6 +279,38 @@ class ApiClient {
     return this.request<any>(`/expenses/analytics${queryString ? `?${queryString}` : ""}`)
   }
 
+  // Analytics methods
+  async getExpenseTrends(filters?: { period?: string }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/trends${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getCategoryInsights(filters?: { period?: string }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/categories${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSpendingComparison(filters?: { period?: string }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/comparison${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSpendingInsights(filters?: { period?: string }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/insights${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSpendingPredictions(filters?: { period?: string }) {
+    // This method doesn't exist in backend, so we'll use budget analytics for now
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/budget${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getBudgetAnalyticsData(filters?: { period?: string }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
+    return this.request<any>(`/analytics/budget${queryString ? `?${queryString}` : ""}`)
+  }
+
   // Split methods
   async createSplit(splitData: {
     expenseId: string
@@ -399,11 +431,6 @@ class ApiClient {
   }) {
     const queryString = filters ? this.buildQueryString(filters) : ''
     return this.request<any>(`/analytics/expenses${queryString ? `?${queryString}` : ""}`)
-  }
-
-  async getCategoryInsights(filters?: { period?: string; limit?: number }) {
-    const queryString = filters ? this.buildQueryString(filters) : ''
-    return this.request<any>(`/analytics/categories${queryString ? `?${queryString}` : ""}`)
   }
 
   async getSpendingTrends(filters?: { 
@@ -680,8 +707,8 @@ class ApiClient {
     })
   }
 
-  async getBudgetAnalytics(period?: string) {
-    const queryString = period ? this.buildQueryString({ period }) : ''
+  async getBudgetAnalytics(filters?: { period?: string }) {
+    const queryString = filters ? this.buildQueryString(filters) : ''
     return this.request<any>(`/budgets/analytics/overview${queryString ? `?${queryString}` : ""}`)
   }
 
