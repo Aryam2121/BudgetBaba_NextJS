@@ -5,6 +5,7 @@ import { GeistMono } from "geist/font/mono"
 import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { AuthProvider } from "@/contexts/AuthContext"
+import { CurrencyProvider } from "@/contexts/CurrencyContext"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { Suspense } from "react"
@@ -73,8 +74,10 @@ export default function RootLayout({
         >
           <Suspense fallback={null}>
             <AuthProvider>
-              {children}
-              <Toaster />
+              <CurrencyProvider>
+                {children}
+                <Toaster />
+              </CurrencyProvider>
             </AuthProvider>
           </Suspense>
         </ThemeProvider>

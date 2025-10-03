@@ -166,6 +166,13 @@ class ApiClient {
     })
   }
 
+  async updateCurrency(currency: string) {
+    return this.request<{ user: any }>("/auth/currency", {
+      method: "PUT",
+      body: JSON.stringify({ currency }),
+    })
+  }
+
   async changePassword(passwords: { currentPassword: string; newPassword: string }) {
     return this.request<{}>("/auth/change-password", {
       method: "POST",
@@ -506,6 +513,22 @@ class ApiClient {
     email?: boolean
     push?: boolean
     inApp?: boolean
+    emailNotifications?: boolean
+    pushNotifications?: boolean
+    soundEnabled?: boolean
+    budgetAlerts?: boolean
+    goalReminders?: boolean
+    expenseAlerts?: boolean
+    splitNotifications?: boolean
+    systemUpdates?: boolean
+    achievementBadges?: boolean
+    weeklyReports?: boolean
+    monthlyReports?: boolean
+    quietHours?: {
+      enabled: boolean
+      start: string
+      end: string
+    }
     types?: {
       split_created?: boolean
       split_updated?: boolean
@@ -518,6 +541,12 @@ class ApiClient {
     return this.request<any>("/notifications/settings", {
       method: "PUT",
       body: JSON.stringify(settings),
+    })
+  }
+
+  async handleNotificationAction(notificationId: string, actionId: string) {
+    return this.request<any>(`/notifications/${notificationId}/actions/${actionId}`, {
+      method: "POST",
     })
   }
 
@@ -804,6 +833,62 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify(reportData),
     })
+  }
+
+  // AI Receipt Processing
+  async processReceipt(formData: FormData) {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
+    
+    const response = await fetch(`${this.baseURL}/ai/process-receipt`, {
+      method: 'POST',
+      headers: {
+        ...(token && { Authorization: `Bearer ${token}` }),
+      },
+      body: formData,
+    })
+
+    if (response.ok) {
+      return await response.json()
+    } else {
+      const error = await response.json()
+      return { error: error.error || 'Receipt processing failed' }
+    }
+  }
+
+  async getReceiptHistory(params?: { page?: number; limit?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<PaginatedResponse<any>>(`/ai/receipts${queryString ? `?${queryString}` : ""}`)
+  }
+
+  // Dashboard methods
+  async getRecentActivity(params?: { limit?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/dashboard/activity${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getQuickInsights(params?: { timeRange?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/dashboard/insights${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getDashboardCharts(params?: { timeRange?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/dashboard/charts${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getBudgetInsights(params?: { timeRange?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/budgets/insights${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getBudgetHealth(params?: { timeRange?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/budgets/health${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSmartRecommendations(params?: { timeRange?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/ai/recommendations${queryString ? `?${queryString}` : ""}`)
   }
 }
 

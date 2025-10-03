@@ -6,6 +6,7 @@ import { Progress } from '@/components/ui/progress'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { 
   Dialog, 
   DialogContent, 
@@ -38,6 +39,7 @@ interface Goal {
 }
 
 const GoalsTracking = () => {
+  const { formatAmount } = useCurrency()
   const [goals, setGoals] = useState<Goal[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -181,13 +183,6 @@ const GoalsTracking = () => {
       case 'low': return 'border-green-500 bg-green-50'
       default: return 'border-gray-500 bg-gray-50'
     }
-  }
-
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
   }
 
   const openEditModal = (goal: Goal) => {
@@ -412,8 +407,8 @@ const GoalsTracking = () => {
                   </div>
                   <Progress value={goal.progressPercentage} className="h-2" />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{formatCurrency(goal.currentAmount)}</span>
-                    <span>{formatCurrency(goal.targetAmount)}</span>
+                    <span>{formatAmount(goal.currentAmount)}</span>
+                    <span>{formatAmount(goal.targetAmount)}</span>
                   </div>
                 </div>
 
@@ -428,7 +423,7 @@ const GoalsTracking = () => {
                   <div className="flex items-center gap-2">
                     <TrendingUp className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">{formatCurrency(goal.averageMonthlyRequired)}</p>
+                      <p className="font-medium">{formatAmount(goal.averageMonthlyRequired)}</p>
                       <p className="text-muted-foreground">per month</p>
                     </div>
                   </div>

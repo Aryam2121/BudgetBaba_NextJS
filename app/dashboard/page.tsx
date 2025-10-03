@@ -2,8 +2,8 @@
 
 import { useState, useEffect } from "react"
 import { useAuth } from "@/contexts/AuthContext"
+import { useCurrency } from "@/contexts/CurrencyContext"
 import { DashboardLayout } from "@/components/DashboardLayout"
-import { formatCurrency } from "@/lib/currency"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -127,6 +127,7 @@ const StatCard: React.FC<StatCardProps> = ({
 
 export default function Dashboard() {
   const { user } = useAuth()
+  const { formatAmount } = useCurrency()
   const [stats, setStats] = useState<DashboardStats>({
     totalExpenses: 0,
     monthlySpent: 0,
@@ -381,14 +382,14 @@ export default function Dashboard() {
           <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
             <StatCard 
               title="Monthly Spending" 
-              value={isBalanceVisible ? formatCurrency(stats.monthlySpent, 'USD') : "••••"} 
+              value={isBalanceVisible ? formatAmount(stats.monthlySpent) : "••••"} 
               change={Math.abs(stats.expenseChange || 0)} 
               icon={Wallet} 
               trend={(stats.expenseChange ?? 0) > 0 ? "up" : "down"} 
             />
             <StatCard 
               title="Remaining Budget" 
-              value={isBalanceVisible ? formatCurrency(stats.remainingBudget, 'USD') : "••••"} 
+              value={isBalanceVisible ? formatAmount(stats.remainingBudget) : "••••"} 
               change={Math.abs(stats.savingsRate || 0)} 
               icon={Target} 
               trend={stats.remainingBudget > 0 ? "up" : "down"} 
@@ -460,7 +461,7 @@ export default function Dashboard() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Avg Daily Spend</span>
-                      <span className="font-medium text-foreground">${isBalanceVisible ? stats.avgDailySpend : '••••'}</span>
+                      <span className="font-medium text-foreground">{isBalanceVisible ? formatAmount(stats.avgDailySpend) : '••••'}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-sm text-muted-foreground">Categories Used</span>
@@ -483,7 +484,7 @@ export default function Dashboard() {
                     <div className="flex justify-between text-sm mb-2">
                       <span>Budget Usage</span>
                       <span className="font-medium">
-                        ${isBalanceVisible ? stats.monthlySpent : '••••'} / ${isBalanceVisible ? (user?.monthlyBudget || 3000) : '••••'}
+                        {isBalanceVisible ? formatAmount(stats.monthlySpent) : '••••'} / {isBalanceVisible ? formatAmount(user?.monthlyBudget || 3000) : '••••'}
                       </span>
                     </div>
                     <Progress 
@@ -678,7 +679,7 @@ export default function Dashboard() {
                           <span className={`font-semibold text-lg ${
                             expense.type === 'income' ? 'text-green-600' : 'text-foreground'
                           }`}>
-                            {expense.type === 'income' ? '+' : '-'}${expense.amount.toFixed(2)}
+                            {expense.type === 'income' ? '+' : '-'}{formatAmount(expense.amount).replace(/^./, '')}
                           </span>
                         </div>
                       </div>
@@ -772,7 +773,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="font-semibold text-lg text-slate-800">${split.amount.toFixed(2)}</p>
+                          <p className="font-semibold text-lg text-slate-800">{formatAmount(split.amount)}</p>
                           <Badge 
                             variant={split.status === 'completed' ? 'default' : 'secondary'}
                             className={`${
@@ -802,7 +803,7 @@ export default function Dashboard() {
                         </div>
                         <div>
                           <div className="text-2xl font-bold text-slate-700">
-                            ${recentSplits.reduce((sum, split) => sum + split.amount, 0).toFixed(2)}
+                            {formatAmount(recentSplits.reduce((sum, split) => sum + split.amount, 0))}
                           </div>
                           <div className="text-sm text-slate-600">Total Amount</div>
                         </div>
@@ -837,7 +838,7 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-slate-600">This Month</span>
                         <span className="font-medium">
-                          ${isBalanceVisible ? stats.monthlySpent.toLocaleString() : '••••••'}
+                          {isBalanceVisible ? formatAmount(stats.monthlySpent) : '••••••'}
                         </span>
                       </div>
                       <Progress 
@@ -850,7 +851,7 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-slate-600">Last Month</span>
                         <span className="font-medium">
-                          ${isBalanceVisible ? ((stats.monthlySpent || 0) * 0.89).toLocaleString() : '••••••'}
+                          {isBalanceVisible ? formatAmount((stats.monthlySpent || 0) * 0.89) : '••••••'}
                         </span>
                       </div>
                       <Progress 
@@ -861,7 +862,7 @@ export default function Dashboard() {
                       <div className="flex items-center justify-between">
                         <span className="text-sm text-slate-600">6-Month Average</span>
                         <span className="font-medium">
-                          ${isBalanceVisible ? ((stats.monthlySpent || 0) * 0.95).toLocaleString() : '••••••'}
+                          {isBalanceVisible ? formatAmount((stats.monthlySpent || 0) * 0.95) : '••••••'}
                         </span>
                       </div>
                       <Progress 

@@ -1,6 +1,7 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
+import { useAuth } from './AuthContext'
 
 interface CurrencyContextType {
   currency: string
@@ -43,21 +44,31 @@ const currencyMap: Record<string, string> = {
 }
 
 export function CurrencyProvider({ children }: { children: React.ReactNode }) {
-  const [currency, setCurrencyState] = useState<string>('USD')
+  const [currency, setCurrencyState] = useState<string>('INR')
   const [isClient, setIsClient] = useState(false)
+  const { user, loading: authLoading } = useAuth()
 
   useEffect(() => {
     // Only run on client side
     setIsClient(true)
     
-    // Try to load from localStorage
-    if (typeof window !== 'undefined') {
-      const savedCurrency = localStorage.getItem('userCurrency')
-      if (savedCurrency) {
-        setCurrencyState(savedCurrency)
+    // Load currency from user profile first, then fallback to localStorage
+    if (!authLoading) {
+      if (user?.currency) {
+        console.log('Loading currency from user profile:', user.currency)
+        setCurrencyState(user.currency)
+      } else if (typeof window !== 'undefined') {
+        const savedCurrency = localStorage.getItem('userCurrency')
+        if (savedCurrency) {
+          console.log('Loading currency from localStorage:', savedCurrency)
+          setCurrencyState(savedCurrency)
+        } else {
+          console.log('Using default currency: INR')
+          setCurrencyState('INR')
+        }
       }
     }
-  }, [])
+  }, [user, authLoading])
 
   const setCurrency = (newCurrency: string) => {
     setCurrencyState(newCurrency)
@@ -68,12 +79,16 @@ export function CurrencyProvider({ children }: { children: React.ReactNode }) {
 
   const updateUserCurrency = async (newCurrency: string) => {
     try {
-      // For now, just update locally
-      // TODO: Integrate with API when ready
+      // Update on backend first
+      const { api } = await import('@/lib/api')
+      await api.updateCurrency(newCurrency)
+      
+      // Update locally after successful backend update
       setCurrency(newCurrency)
       return Promise.resolve()
     } catch (error) {
       console.error('Error updating user currency:', error)
+      // Still update locally as fallback
       setCurrency(newCurrency)
       throw error
     }

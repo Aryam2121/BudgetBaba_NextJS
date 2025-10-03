@@ -34,6 +34,12 @@ const userSchema = new mongoose.Schema({
     default: 0,
     min: [0, "Budget cannot be negative"],
   },
+  currency: {
+    type: String,
+    default: 'INR',
+    enum: ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'INR', 'CNY', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RUB', 'KRW', 'SGD', 'HKD', 'MXN', 'BRL', 'ZAR', 'THB', 'TRY', 'ILS', 'AED', 'SAR'],
+    trim: true,
+  },
   // Email integration fields for personal email sending
   emailConnections: {
     gmail: {

@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -97,6 +98,7 @@ interface UserSettings {
 
 export default function SettingsPage() {
   const { user, logout } = useAuth()
+  const { currency, setCurrency, currencySymbol, formatAmount } = useCurrency()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [activeTab, setActiveTab] = useState('profile')
@@ -240,6 +242,19 @@ export default function SettingsPage() {
     }
   }
 
+  const handleCurrencyChange = async (newCurrency: string) => {
+    try {
+      setSaving(true)
+      setCurrency(newCurrency)
+      toast.success(`Currency updated to ${newCurrency} successfully!`)
+    } catch (error) {
+      console.error('Error updating currency:', error)
+      toast.error('Failed to update currency')
+    } finally {
+      setSaving(false)
+    }
+  }
+
   const handleExportData = async () => {
     try {
       // Simulate data export
@@ -358,6 +373,10 @@ export default function SettingsPage() {
               <TabsTrigger value="preferences">
                 <Settings className="h-4 w-4 mr-2" />
                 Preferences
+              </TabsTrigger>
+              <TabsTrigger value="currency">
+                <CreditCard className="h-4 w-4 mr-2" />
+                Currency
               </TabsTrigger>
               <TabsTrigger value="security">
                 <Shield className="h-4 w-4 mr-2" />
@@ -678,6 +697,98 @@ export default function SettingsPage() {
                         </div>
                       </div>
                     </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+
+            <TabsContent value="currency" className="space-y-6">
+              <div className="grid gap-6 lg:grid-cols-2">
+                {/* Currency Settings */}
+                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <CreditCard className="h-5 w-5 text-green-600" />
+                      Currency Settings
+                    </CardTitle>
+                    <CardDescription>
+                      Configure your preferred currency for all financial displays
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <Label htmlFor="currency-select">Default Currency</Label>
+                      <Select value={currency} onValueChange={handleCurrencyChange}>
+                        <SelectTrigger id="currency-select">
+                          <SelectValue placeholder="Select currency" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="INR">🇮🇳 Indian Rupee (₹)</SelectItem>
+                          <SelectItem value="USD">🇺🇸 US Dollar ($)</SelectItem>
+                          <SelectItem value="EUR">🇪🇺 Euro (€)</SelectItem>
+                          <SelectItem value="GBP">🇬🇧 British Pound (£)</SelectItem>
+                          <SelectItem value="JPY">🇯🇵 Japanese Yen (¥)</SelectItem>
+                          <SelectItem value="CAD">🇨🇦 Canadian Dollar ($)</SelectItem>
+                          <SelectItem value="AUD">🇦🇺 Australian Dollar ($)</SelectItem>
+                          <SelectItem value="CNY">🇨🇳 Chinese Yuan (¥)</SelectItem>
+                          <SelectItem value="CHF">🇨🇭 Swiss Franc (CHF)</SelectItem>
+                          <SelectItem value="SGD">🇸🇬 Singapore Dollar ($)</SelectItem>
+                          <SelectItem value="AED">🇦🇪 UAE Dirham (د.إ)</SelectItem>
+                          <SelectItem value="SAR">🇸🇦 Saudi Riyal (﷼)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      
+                      <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg border border-green-200">
+                        <div>
+                          <p className="text-sm font-medium text-green-800">Current Symbol</p>
+                          <p className="text-lg font-bold text-green-900">{currencySymbol}</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm text-green-600">Sample Amount</p>
+                          <p className="text-lg font-bold text-green-900">{formatAmount(1234.56)}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Currency Format Preview */}
+                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Globe className="h-5 w-5 text-blue-600" />
+                      Format Preview
+                    </CardTitle>
+                    <CardDescription>
+                      See how amounts will appear throughout the app
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span className="text-sm text-blue-600">Small Amount:</span>
+                        <span className="font-bold text-blue-900">{formatAmount(25.50)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span className="text-sm text-blue-600">Medium Amount:</span>
+                        <span className="font-bold text-blue-900">{formatAmount(1250.75)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span className="text-sm text-blue-600">Large Amount:</span>
+                        <span className="font-bold text-blue-900">{formatAmount(125000.00)}</span>
+                      </div>
+                      <div className="flex justify-between items-center p-3 bg-blue-50 rounded-lg">
+                        <span className="text-sm text-blue-600">Very Large Amount:</span>
+                        <span className="font-bold text-blue-900">{formatAmount(1250000.50)}</span>
+                      </div>
+                    </div>
+                    
+                    <Alert>
+                      <CheckCircle2 className="h-4 w-4" />
+                      <AlertDescription>
+                        Currency changes apply immediately to all pages and charts in your expense tracker.
+                      </AlertDescription>
+                    </Alert>
                   </CardContent>
                 </Card>
               </div>

@@ -37,6 +37,7 @@ const register = async (req, res) => {
       name,
       email,
       passwordHash: password, // Will be hashed by pre-save middleware
+      currency: 'INR', // Default to Indian Rupees
     })
 
     await user.save()
@@ -52,6 +53,7 @@ const register = async (req, res) => {
         name: user.name,
         email: user.email,
         monthlyBudget: user.monthlyBudget,
+        currency: user.currency,
       },
     })
   } catch (error) {
@@ -92,6 +94,7 @@ const login = async (req, res) => {
         name: user.name,
         email: user.email,
         monthlyBudget: user.monthlyBudget,
+        currency: user.currency || 'INR', // Default to INR if not set
       },
     })
   } catch (error) {
@@ -151,6 +154,7 @@ const googleCallback = async (req, res) => {
         name: userInfo.name,
         email: userInfo.email,
         passwordHash: Math.random().toString(36), // Random password for OAuth users
+        currency: 'INR', // Default to Indian Rupees
         emailConnections: {
           gmail: {
             connected: true,
@@ -198,6 +202,7 @@ const googleCallback = async (req, res) => {
         name: user.name,
         email: user.email,
         monthlyBudget: user.monthlyBudget,
+        currency: user.currency || 'INR', // Default to INR if not set
         emailConnections: {
           gmail: {
             connected: user.emailConnections.gmail.connected,

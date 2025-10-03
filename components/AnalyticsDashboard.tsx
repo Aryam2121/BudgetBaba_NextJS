@@ -34,6 +34,7 @@ import {
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useToast } from '@/hooks/use-toast'
+import { useCurrency } from '@/contexts/CurrencyContext'
 
 interface AnalyticsData {
   expenseTrends: Array<{
@@ -83,6 +84,7 @@ const AnalyticsDashboard = () => {
   const [timeRange, setTimeRange] = useState('last_month')
   const [categories, setCategories] = useState<string[]>([])
   const { toast } = useToast()
+  const { formatAmount } = useCurrency()
 
   useEffect(() => {
     fetchAnalytics()
@@ -176,13 +178,6 @@ const AnalyticsDashboard = () => {
     }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
-  }
-
   const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#f97316', '#06b6d4', '#84cc16']
 
   if (loading) {
@@ -238,7 +233,7 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
-                <h3 className="text-2xl font-bold">{formatCurrency(analyticsData.spendingInsights.totalSpent)}</h3>
+                <h3 className="text-2xl font-bold">{formatAmount(analyticsData.spendingInsights.totalSpent)}</h3>
               </div>
               <DollarSign className="h-8 w-8 text-primary" />
             </div>
@@ -260,7 +255,7 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Daily Average</p>
-                <h3 className="text-2xl font-bold">{formatCurrency(analyticsData.spendingInsights.avgDailySpending)}</h3>
+                <h3 className="text-2xl font-bold">{formatAmount(analyticsData.spendingInsights.avgDailySpending)}</h3>
               </div>
               <Calendar className="h-8 w-8 text-primary" />
             </div>
@@ -275,7 +270,7 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Next Month Prediction</p>
-                <h3 className="text-2xl font-bold">{formatCurrency(analyticsData.predictions.nextMonthPrediction)}</h3>
+                <h3 className="text-2xl font-bold">{formatAmount(analyticsData.predictions.nextMonthPrediction)}</h3>
               </div>
               <Target className="h-8 w-8 text-primary" />
             </div>
@@ -290,7 +285,7 @@ const AnalyticsDashboard = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Savings Potential</p>
-                <h3 className="text-2xl font-bold">{formatCurrency(analyticsData.predictions.savingsPotential)}</h3>
+                <h3 className="text-2xl font-bold">{formatAmount(analyticsData.predictions.savingsPotential)}</h3>
               </div>
               <TrendingUp className="h-8 w-8 text-green-500" />
             </div>
@@ -322,7 +317,7 @@ const AnalyticsDashboard = () => {
                   <XAxis dataKey="period" />
                   <YAxis />
                   <Tooltip 
-                    formatter={(value, name) => [formatCurrency(Number(value)), name]}
+                    formatter={(value, name) => [formatAmount(Number(value)), name]}
                   />
                   <Area 
                     type="monotone" 
@@ -369,7 +364,7 @@ const AnalyticsDashboard = () => {
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip formatter={(value) => [formatCurrency(Number(value)), 'Amount']} />
+                    <Tooltip formatter={(value) => [formatAmount(Number(value)), 'Amount']} />
                   </PieChart>
                 </ResponsiveContainer>
               </CardContent>
@@ -395,7 +390,7 @@ const AnalyticsDashboard = () => {
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-medium">{formatCurrency(category.amount)}</p>
+                        <p className="font-medium">{formatAmount(category.amount)}</p>
                         <p className="text-sm text-muted-foreground">{category.percentage.toFixed(1)}%</p>
                       </div>
                     </div>
@@ -420,7 +415,7 @@ const AnalyticsDashboard = () => {
                       <div>
                         <h4 className="font-medium">{budget.category}</h4>
                         <p className="text-sm text-muted-foreground">
-                          {formatCurrency(budget.spent)} of {formatCurrency(budget.budgeted)}
+                          {formatAmount(budget.spent)} of {formatAmount(budget.budgeted)}
                         </p>
                       </div>
                       <div className="text-right">
@@ -433,7 +428,7 @@ const AnalyticsDashboard = () => {
                           {budget.utilization.toFixed(1)}%
                         </Badge>
                         <p className="text-sm text-muted-foreground mt-1">
-                          {formatCurrency(budget.remaining)} remaining
+                          {formatAmount(budget.remaining)} remaining
                         </p>
                       </div>
                     </div>
@@ -461,7 +456,7 @@ const AnalyticsDashboard = () => {
                   <XAxis dataKey="month" />
                   <YAxis />
                   <Tooltip 
-                    formatter={(value, name) => [formatCurrency(Number(value)), name]}
+                    formatter={(value, name) => [formatAmount(Number(value)), name]}
                   />
                   <Bar dataKey="currentYear" fill="#3b82f6" name="Current Year" />
                   <Bar dataKey="previousYear" fill="#94a3b8" name="Previous Year" />

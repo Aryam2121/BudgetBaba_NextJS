@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Progress } from '@/components/ui/progress'
+import { useCurrency } from '@/contexts/CurrencyContext'
 import { 
   Dialog, 
   DialogContent, 
@@ -51,6 +52,7 @@ interface Budget {
 }
 
 const BudgetManagement = () => {
+  const { formatAmount } = useCurrency()
   const [budgets, setBudgets] = useState<Budget[]>([])
   const [loading, setLoading] = useState(true)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
@@ -237,13 +239,6 @@ const BudgetManagement = () => {
     }
   }
 
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount)
-  }
-
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString()
   }
@@ -404,9 +399,9 @@ const BudgetManagement = () => {
                 ))}
 
                 <div className="text-sm text-muted-foreground">
-                  Total allocated: {formatCurrency(formData.categories.reduce((sum, cat) => sum + parseFloat(cat.amount || '0'), 0))}
+                  Total allocated: {formatAmount(formData.categories.reduce((sum, cat) => sum + parseFloat(cat.amount || '0'), 0))}
                   {formData.totalAmount && (
-                    <span> of {formatCurrency(parseFloat(formData.totalAmount))}</span>
+                    <span> of {formatAmount(parseFloat(formData.totalAmount))}</span>
                   )}
                 </div>
               </div>
@@ -490,8 +485,8 @@ const BudgetManagement = () => {
                     className={`h-2 ${budget.status === 'exceeded' ? 'bg-red-100' : ''}`}
                   />
                   <div className="flex justify-between text-sm text-muted-foreground">
-                    <span>{formatCurrency(budget.totalSpent)} spent</span>
-                    <span>{formatCurrency(budget.totalAmount)} budget</span>
+                    <span>{formatAmount(budget.totalSpent)} spent</span>
+                    <span>{formatAmount(budget.totalAmount)} budget</span>
                   </div>
                 </div>
 
@@ -499,7 +494,7 @@ const BudgetManagement = () => {
                   <Alert>
                     <AlertTriangle className="h-4 w-4" />
                     <AlertDescription>
-                      Budget exceeded by {formatCurrency(budget.totalSpent - budget.totalAmount)}
+                      Budget exceeded by {formatAmount(budget.totalSpent - budget.totalAmount)}
                     </AlertDescription>
                   </Alert>
                 )}
@@ -508,7 +503,7 @@ const BudgetManagement = () => {
                   <div className="flex items-center gap-2">
                     <DollarSign className="h-4 w-4 text-muted-foreground" />
                     <div>
-                      <p className="font-medium">{formatCurrency(budget.remainingAmount)}</p>
+                      <p className="font-medium">{formatAmount(budget.remainingAmount)}</p>
                       <p className="text-muted-foreground">remaining</p>
                     </div>
                   </div>
@@ -527,8 +522,8 @@ const BudgetManagement = () => {
                     <div key={category._id} className="flex items-center justify-between text-sm">
                       <span>{category.name}</span>
                       <div className="flex items-center gap-2">
-                        <span>{formatCurrency(category.spent)}</span>
-                        <span className="text-muted-foreground">/ {formatCurrency(category.amount)}</span>
+                        <span>{formatAmount(category.spent)}</span>
+                        <span className="text-muted-foreground">/ {formatAmount(category.amount)}</span>
                         <Badge 
                           variant="outline" 
                           className={`text-xs ${

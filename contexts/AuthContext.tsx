@@ -9,6 +9,7 @@ interface User {
   name: string
   email: string
   monthlyBudget: number
+  currency?: string
 }
 
 interface AuthContextType {

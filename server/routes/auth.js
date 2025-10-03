@@ -43,4 +43,29 @@ router.put("/budget", authMiddleware, async (req, res) => {
   }
 })
 
+// Update user currency
+router.put("/currency", authMiddleware, async (req, res) => {
+  try {
+    const { currency } = req.body
+    const userId = req.user._id
+
+    // List of supported currencies
+    const supportedCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'INR', 'CNY', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RUB', 'KRW', 'SGD', 'HKD', 'MXN', 'BRL', 'ZAR', 'THB', 'TRY', 'ILS', 'AED', 'SAR']
+
+    if (!currency || !supportedCurrencies.includes(currency)) {
+      return res.status(400).json({ error: "Valid currency code is required" })
+    }
+
+    const user = await User.findByIdAndUpdate(userId, { currency }, { new: true }).select("-passwordHash")
+
+    res.json({
+      message: "Currency updated successfully",
+      user,
+    })
+  } catch (error) {
+    console.error("Currency update error:", error)
+    res.status(500).json({ error: "Failed to update currency" })
+  }
+})
+
 module.exports = router
