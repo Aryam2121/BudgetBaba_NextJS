@@ -154,8 +154,12 @@ const AnalyticsDashboard = () => {
         // includeAnalytics: true
       })
       
+      if (!response.data) {
+        throw new Error('No data received from export')
+      }
+      
       // Create download link
-      const blob = new Blob([response.data], { type: 'text/csv' })
+      const blob = new Blob([response.data.blob], { type: 'text/csv' })
       const url = window.URL.createObjectURL(blob)
       const link = document.createElement('a')
       link.href = url
