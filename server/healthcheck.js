@@ -1,7 +1,8 @@
 const http = require("http")
 
+// Use 0.0.0.0 instead of localhost for Docker/Render compatibility
 const options = {
-  host: "localhost",
+  host: process.env.HOST || "0.0.0.0",
   port: process.env.PORT || 5000,
   path: "/api/health",
   timeout: 2000,

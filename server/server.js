@@ -20,12 +20,19 @@ const exportRoutes = require("./routes/exports")
 
 const app = express()
 const server = http.createServer(app)
+
+// Dynamic CORS configuration
+const allowedOrigins = process.env.NODE_ENV === 'production'
+  ? [
+      process.env.FRONTEND_URL || 'https://budgetbaba.vercel.app/'
+    ]
+  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://budgetbaba.vercel.app/']
+
 const io = socketIo(server, {
   cors: {
-    origin: process.env.NODE_ENV === 'production' 
-      ? 'https://your-domain.com' 
-      : ['http://localhost:3000', 'http://127.0.0.1:3000'],
-    credentials: true
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
   }
 })
 
@@ -52,10 +59,19 @@ if (!process.env.MONGODB_URI) {
 
 // CORS configuration
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-domain.com' 
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true)
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization']
 }))
 
 // Body parser middleware
@@ -144,10 +160,13 @@ mongoose
   })
   .then(() => {
     console.log("Connected to MongoDB Atlas successfully")
-    server.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`)
+    // Listen on 0.0.0.0 for Render/Docker compatibility
+    const HOST = process.env.HOST || '0.0.0.0'
+    server.listen(PORT, HOST, () => {
+      console.log(`Server running on ${HOST}:${PORT}`)
       console.log(`Environment: ${process.env.NODE_ENV}`)
       console.log(`Socket.IO enabled for real-time updates`)
+      console.log(`Allowed origins: ${allowedOrigins.join(', ')}`)
       
       // Start scheduler service
       scheduler.start()
