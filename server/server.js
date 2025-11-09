@@ -24,9 +24,15 @@ const server = http.createServer(app)
 // Dynamic CORS configuration
 const allowedOrigins = process.env.NODE_ENV === 'production'
   ? [
-      process.env.FRONTEND_URL || 'https://budgetbaba.vercel.app/'
+      process.env.FRONTEND_URL || 'https://budgetbaba.vercel.app',
+      'https://budgetbaba.vercel.app',
+      'https://budgetbaba-nextjs.onrender.com'
     ]
-  : ['http://localhost:3000', 'http://127.0.0.1:3000', 'https://budgetbaba.vercel.app/']
+  : [
+      'http://localhost:3000', 
+      'http://127.0.0.1:3000', 
+      'https://budgetbaba.vercel.app'
+    ]
 
 const io = socketIo(server, {
   cors: {
@@ -66,12 +72,16 @@ app.use(cors({
     if (allowedOrigins.indexOf(origin) !== -1 || allowedOrigins.includes('*')) {
       callback(null, true)
     } else {
+      console.warn(`CORS blocked origin: ${origin}`)
+      console.warn(`Allowed origins: ${allowedOrigins.join(', ')}`)
       callback(new Error('Not allowed by CORS'))
     }
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Range', 'X-Content-Range'],
+  maxAge: 86400 // 24 hours
 }))
 
 // Body parser middleware
