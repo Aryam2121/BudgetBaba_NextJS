@@ -41,7 +41,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex light" style={{ colorScheme: 'light' }}>
       {/* Left side - Hero Section */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-12 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -101,7 +101,7 @@ export default function LoginPage() {
             <p className="mt-2 text-gray-600">Sign in to your account to continue</p>
           </div>
 
-          <Card className="shadow-xl border-0">
+          <Card className="shadow-xl border-0 !bg-white !text-gray-900">
             <CardContent className="p-8">
               {/* Google OAuth */}
               <GoogleLogin />
@@ -135,7 +135,7 @@ export default function LoginPage() {
                     onChange={(e) => setEmail(e.target.value)}
                     required
                     disabled={loading}
-                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                    className="h-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 !bg-white !text-gray-900"
                   />
                 </div>
 
@@ -152,7 +152,7 @@ export default function LoginPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 pr-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-11 pr-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 !bg-white !text-gray-900"
                     />
                     <button
                       type="button"

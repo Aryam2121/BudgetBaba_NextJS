@@ -122,4 +122,24 @@
   body {
     @apply bg-background text-foreground;
   }
+  
+  /* Force light mode for auth pages */
+  [data-theme="light"],
+  [data-theme="light"] * {
+    color-scheme: light !important;
+  }
+  
+  /* Override dark mode for auth cards and inputs */
+  [data-theme="light"] [class*="card"],
+  [data-theme="light"] [role="dialog"],
+  [data-theme="light"] input,
+  [data-theme="light"] button {
+    background-color: white !important;
+    color: rgb(17 24 39) !important;
+    border-color: rgb(209 213 219) !important;
+  }
+  
+  [data-theme="light"] input::placeholder {
+    color: rgb(156 163 175) !important;
+  }
 }

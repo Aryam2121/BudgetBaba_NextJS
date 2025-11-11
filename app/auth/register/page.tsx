@@ -71,7 +71,7 @@ export default function RegisterPage() {
   const passwordStrength = getPasswordStrength()
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex light" style={{ colorScheme: 'light' }}>
       {/* Left side - Hero Section */}
       <div className="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-green-600 via-blue-600 to-purple-700 p-12 text-white relative overflow-hidden">
         <div className="absolute inset-0 bg-black/10"></div>
@@ -118,7 +118,7 @@ export default function RegisterPage() {
             <p className="mt-2 text-gray-600">Get started with your expense tracking journey</p>
           </div>
 
-          <Card className="shadow-xl border-0">
+          <Card className="shadow-xl border-0 !bg-white !text-gray-900">
             <CardContent className="p-8">
               {/* Google OAuth */}
               <GoogleLogin />
@@ -153,7 +153,7 @@ export default function RegisterPage() {
                       onChange={(e) => setName(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 pl-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-11 pl-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 !bg-white !text-gray-900"
                     />
                     <User className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   </div>
@@ -172,7 +172,7 @@ export default function RegisterPage() {
                       onChange={(e) => setEmail(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 pl-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-11 pl-11 border-gray-300 focus:border-blue-500 focus:ring-blue-500 !bg-white !text-gray-900"
                     />
                     <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                   </div>
@@ -191,7 +191,7 @@ export default function RegisterPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 pl-11 pr-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-11 pl-11 pr-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 !bg-white !text-gray-900"
                     />
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <button
@@ -238,7 +238,7 @@ export default function RegisterPage() {
                       onChange={(e) => setConfirmPassword(e.target.value)}
                       required
                       disabled={loading}
-                      className="h-11 pl-11 pr-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                      className="h-11 pl-11 pr-12 border-gray-300 focus:border-blue-500 focus:ring-blue-500 !bg-white !text-gray-900"
                     />
                     <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
                     <button
