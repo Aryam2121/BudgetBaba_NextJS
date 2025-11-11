@@ -944,6 +944,66 @@ class ApiClient {
       method: 'POST'
     })
   }
+
+  // Subscription management methods
+  async getSubscriptions(params?: { status?: 'active' | 'paused' | 'cancelled'; sort?: 'amount' | 'name' | 'date' }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/subscriptions${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSubscription(id: string) {
+    return this.request<any>(`/subscriptions/${id}`)
+  }
+
+  async createSubscription(data: {
+    name: string
+    description?: string
+    amount: number
+    currency?: string
+    billingCycle?: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    startDate: string
+    category?: string
+    icon?: string
+    color?: string
+    reminderDays?: number
+    website?: string
+    notes?: string
+    paymentMethod?: string
+  }) {
+    return this.request<any>('/subscriptions', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async updateSubscription(id: string, data: any) {
+    return this.request<any>(`/subscriptions/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async deleteSubscription(id: string) {
+    return this.request<any>(`/subscriptions/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async processSubscriptionPayment(id: string, data?: { status?: 'paid' | 'pending' | 'failed'; createExpense?: boolean }) {
+    return this.request<any>(`/subscriptions/${id}/payment`, {
+      method: 'POST',
+      body: JSON.stringify(data || {})
+    })
+  }
+
+  async getUpcomingRenewals(days?: number) {
+    const queryString = days ? this.buildQueryString({ days }) : ''
+    return this.request<any>(`/subscriptions/upcoming${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getSubscriptionAnalytics() {
+    return this.request<any>('/subscriptions/analytics')
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL)
