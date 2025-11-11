@@ -35,7 +35,8 @@ import {
   ChevronRight,
   Repeat,
   Tag,
-  Sparkles
+  Sparkles,
+  Scan
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -153,6 +154,12 @@ const navigationItems = [
         href: "/insights",
         icon: Sparkles,
         badge: "New"
+      },
+      {
+        title: "Receipt Scanner",
+        href: "/receipts",
+        icon: Scan,
+        badge: "AI"
       },
       {
         title: "Data Exports",

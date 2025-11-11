@@ -1018,6 +1018,39 @@ class ApiClient {
   async getSavingsOpportunities() {
     return this.request<any>('/insights/savings-opportunities')
   }
+
+  // Currency conversion methods
+  async getCurrencyRates() {
+    return this.request<any>('/currency/rates')
+  }
+
+  async convertCurrency(amount: number, from: string, to: string) {
+    return this.request<any>('/currency/convert', {
+      method: 'POST',
+      body: JSON.stringify({ amount, from, to })
+    })
+  }
+
+  async convertToMultipleCurrencies(amount: number, from: string, to: string[]) {
+    return this.request<any>('/currency/convert-multiple', {
+      method: 'POST',
+      body: JSON.stringify({ amount, from, to })
+    })
+  }
+
+  async getExchangeRate(from: string, to: string) {
+    return this.request<any>(`/currency/rate/${from}/${to}`)
+  }
+
+  async getSupportedCurrencies() {
+    return this.request<any>('/currency/supported')
+  }
+
+  async refreshCurrencyRates() {
+    return this.request<any>('/currency/refresh', {
+      method: 'POST'
+    })
+  }
 }
 
 export const api = new ApiClient(API_BASE_URL)

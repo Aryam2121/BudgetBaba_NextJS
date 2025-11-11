@@ -20,7 +20,8 @@ const exportRoutes = require("./routes/exports")
 const categoriesRoutes = require("./routes/categories")
 const subscriptionsRoutes = require("./routes/subscriptions")
 const insightsRoutes = require("./routes/insights")
-const subscriptionsRoutes = require("./routes/subscriptions")
+const currencyRoutes = require("./routes/currency")
+const receiptsRoutes = require("./routes/receipts")
 
 const app = express()
 const server = http.createServer(app)
@@ -106,7 +107,11 @@ app.use("/api/exports", exportRoutes)
 app.use("/api/categories", categoriesRoutes)
 app.use("/api/subscriptions", subscriptionsRoutes)
 app.use("/api/insights", insightsRoutes)
-app.use("/api/subscriptions", subscriptionsRoutes)
+app.use("/api/currency", currencyRoutes)
+app.use("/api/receipts", receiptsRoutes)
+
+// Serve uploaded files
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")))
 
 // Make io available to routes
 app.set('socketio', io)
