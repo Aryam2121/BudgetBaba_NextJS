@@ -17,6 +17,7 @@ const goalRoutes = require("./routes/goals")
 const recurringRoutes = require("./routes/recurring")
 const budgetRoutes = require("./routes/budgets")
 const exportRoutes = require("./routes/exports")
+const categoriesRoutes = require("./routes/categories")
 
 const app = express()
 const server = http.createServer(app)
@@ -99,6 +100,7 @@ app.use("/api/goals", goalRoutes)
 app.use("/api/recurring", recurringRoutes)
 app.use("/api/budgets", budgetRoutes)
 app.use("/api/exports", exportRoutes)
+app.use("/api/categories", categoriesRoutes)
 
 // Make io available to routes
 app.set('socketio', io)

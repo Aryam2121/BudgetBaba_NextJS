@@ -259,7 +259,8 @@ class ApiClient {
     })
   }
 
-  async getCategories() {
+  async getExpenseCategories() {
+    // Legacy method - returns list of expense categories
     return this.request<string[]>("/expenses/categories")
   }
 
@@ -889,6 +890,59 @@ class ApiClient {
   async getSmartRecommendations(params?: { timeRange?: number }) {
     const queryString = params ? this.buildQueryString(params) : ''
     return this.request<any>(`/ai/recommendations${queryString ? `?${queryString}` : ""}`)
+  }
+
+  // Category management methods
+  async getCategories(params?: { type?: 'expense' | 'income' | 'both'; active?: boolean }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/categories${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async createCategory(data: {
+    name: string
+    icon?: string
+    color?: string
+    type?: 'expense' | 'income' | 'both'
+    description?: string
+  }) {
+    return this.request<any>('/categories', {
+      method: 'POST',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async updateCategory(id: string, data: {
+    name?: string
+    icon?: string
+    color?: string
+    type?: 'expense' | 'income' | 'both'
+    description?: string
+    isActive?: boolean
+    order?: number
+  }) {
+    return this.request<any>(`/categories/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data)
+    })
+  }
+
+  async deleteCategory(id: string) {
+    return this.request<any>(`/categories/${id}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async reorderCategories(categories: { id: string; order: number }[]) {
+    return this.request<any>('/categories/reorder', {
+      method: 'POST',
+      body: JSON.stringify({ categories })
+    })
+  }
+
+  async seedDefaultCategories() {
+    return this.request<any>('/categories/seed', {
+      method: 'POST'
+    })
   }
 }
 
