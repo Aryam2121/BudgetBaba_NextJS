@@ -32,7 +32,10 @@ import {
   Zap,
   Activity,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Repeat,
+  Tag,
+  Sparkles
 } from 'lucide-react'
 
 interface SidebarProps {
@@ -87,12 +90,6 @@ const navigationItems = [
         href: "/expenses/upload",
         icon: Upload,
         badge: null
-      },
-      {
-        title: "Categories",
-        href: "/expenses/categories",
-        icon: PieChart,
-        badge: null
       }
     ]
   },
@@ -100,9 +97,21 @@ const navigationItems = [
     title: "Financial Management",
     items: [
       {
+        title: "Categories",
+        href: "/categories",
+        icon: Tag,
+        badge: null
+      },
+      {
         title: "Budget Tracker",
         href: "/budget",
         icon: Target,
+        badge: null
+      },
+      {
+        title: "Subscriptions",
+        href: "/subscriptions",
+        icon: Repeat,
         badge: null
       },
       {
@@ -139,6 +148,12 @@ const navigationItems = [
   {
     title: "Tools & Reports",
     items: [
+      {
+        title: "AI Insights",
+        href: "/insights",
+        icon: Sparkles,
+        badge: "New"
+      },
       {
         title: "Data Exports",
         href: "/exports",

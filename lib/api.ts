@@ -303,7 +303,7 @@ class ApiClient {
     return this.request<any>(`/analytics/comparison${queryString ? `?${queryString}` : ""}`)
   }
 
-  async getSpendingInsights(filters?: { period?: string }) {
+  async getAnalyticsInsights(filters?: { period?: string }) {
     const queryString = filters ? this.buildQueryString(filters) : ''
     return this.request<any>(`/analytics/insights${queryString ? `?${queryString}` : ""}`)
   }
@@ -1003,6 +1003,20 @@ class ApiClient {
 
   async getSubscriptionAnalytics() {
     return this.request<any>('/subscriptions/analytics')
+  }
+
+  // AI Insights methods
+  async getSpendingInsights(params?: { timeRange?: number }) {
+    const queryString = params ? this.buildQueryString(params) : ''
+    return this.request<any>(`/insights/spending${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async getBudgetRecommendationsAI() {
+    return this.request<any>('/insights/budget-recommendations')
+  }
+
+  async getSavingsOpportunities() {
+    return this.request<any>('/insights/savings-opportunities')
   }
 }
 

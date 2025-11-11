@@ -13,7 +13,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { 
   Plus, Edit2, Trash2, Calendar, DollarSign, AlertCircle, 
   TrendingUp, Pause, Play, X, ExternalLink, CreditCard, BarChart3,
-  Netflix, Music, Zap, Tv, Cloud, Package
+  Music, Zap, Tv, Cloud, Package
 } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useCurrency } from '@/contexts/CurrencyContext'
@@ -30,13 +30,26 @@ export default function SubscriptionTracker() {
   const [editingSubscription, setEditingSubscription] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('active')
   
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string
+    description: string
+    amount: string
+    billingCycle: 'daily' | 'weekly' | 'monthly' | 'quarterly' | 'yearly'
+    startDate: string
+    category: string
+    icon: string
+    color: string
+    website: string
+    notes: string
+    paymentMethod: string
+    reminderDays: string
+  }>({
     name: '',
     description: '',
     amount: '',
     billingCycle: 'monthly',
     startDate: new Date().toISOString().split('T')[0],
-    category: 'Subscriptions',
+    category: '',
     icon: 'Repeat',
     color: '#8B5CF6',
     website: '',

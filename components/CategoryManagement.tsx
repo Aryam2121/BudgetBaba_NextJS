@@ -57,7 +57,13 @@ export default function CategoryManagement() {
   const [loading, setLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<any>(null)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    name: string
+    icon: string
+    color: string
+    type: 'expense' | 'income' | 'both'
+    description: string
+  }>({
     name: '',
     icon: 'Tag',
     color: '#3B82F6',
