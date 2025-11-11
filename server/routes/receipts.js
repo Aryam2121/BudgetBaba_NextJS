@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const path = require('path');
-const { authenticate } = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
 const { upload, receiptProcessor } = require('../services/receiptProcessor');
 const fs = require('fs').promises;
 
 // Process receipt image
-router.post('/process', authenticate, upload.single('receipt'), async (req, res) => {
+router.post('/process', authMiddleware, upload.single('receipt'), async (req, res) => {
   let filePath = null;
 
   try {
@@ -61,7 +61,7 @@ router.post('/process', authenticate, upload.single('receipt'), async (req, res)
 });
 
 // Get receipt processing history
-router.get('/history', authenticate, async (req, res) => {
+router.get('/history', authMiddleware, async (req, res) => {
   try {
     // This would query a Receipt model if we implement persistent storage
     // For now, return empty array
@@ -80,7 +80,7 @@ router.get('/history', authenticate, async (req, res) => {
 });
 
 // Delete receipt image
-router.delete('/:filename', authenticate, async (req, res) => {
+router.delete('/:filename', authMiddleware, async (req, res) => {
   try {
     const { filename } = req.params;
     
@@ -120,7 +120,7 @@ router.delete('/:filename', authenticate, async (req, res) => {
 });
 
 // Test OCR endpoint (for testing only)
-router.get('/test', authenticate, async (req, res) => {
+router.get('/test', authMiddleware, async (req, res) => {
   try {
     res.json({
       success: true,

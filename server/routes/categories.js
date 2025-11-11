@@ -1,10 +1,10 @@
 const express = require('express')
 const router = express.Router()
 const categoriesController = require('../controllers/categoriesController')
-const { protect } = require('../middleware/auth')
+const authMiddleware = require('../middleware/auth')
 
 // Apply authentication to all routes
-router.use(protect)
+router.use(authMiddleware)
 
 // Routes
 router.get('/', categoriesController.getCategories)

@@ -1,10 +1,10 @@
 const express = require('express');
 const router = express.Router();
 const currencyConverter = require('../services/currencyConverter');
-const { authenticate } = require('../middleware/auth');
+const authMiddleware = require('../middleware/auth');
 
 // Get all supported currencies and current rates
-router.get('/rates', authenticate, async (req, res) => {
+router.get('/rates', authMiddleware, async (req, res) => {
   try {
     const rates = await currencyConverter.getRates();
     const cacheInfo = currencyConverter.getCacheInfo();
@@ -28,7 +28,7 @@ router.get('/rates', authenticate, async (req, res) => {
 });
 
 // Convert amount between currencies
-router.post('/convert', authenticate, async (req, res) => {
+router.post('/convert', authMiddleware, async (req, res) => {
   try {
     const { amount, from, to } = req.body;
 
@@ -79,7 +79,7 @@ router.post('/convert', authenticate, async (req, res) => {
 });
 
 // Convert amount to multiple currencies
-router.post('/convert-multiple', authenticate, async (req, res) => {
+router.post('/convert-multiple', authMiddleware, async (req, res) => {
   try {
     const { amount, from, to } = req.body;
 
@@ -123,7 +123,7 @@ router.post('/convert-multiple', authenticate, async (req, res) => {
 });
 
 // Get exchange rate between two currencies
-router.get('/rate/:from/:to', authenticate, async (req, res) => {
+router.get('/rate/:from/:to', authMiddleware, async (req, res) => {
   try {
     const { from, to } = req.params;
 
@@ -216,7 +216,7 @@ router.get('/supported', async (req, res) => {
 });
 
 // Refresh currency rates (manual trigger)
-router.post('/refresh', authenticate, async (req, res) => {
+router.post('/refresh', authMiddleware, async (req, res) => {
   try {
     const success = await currencyConverter.fetchRates();
     const cacheInfo = currencyConverter.getCacheInfo();
