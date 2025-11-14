@@ -840,7 +840,7 @@ class ApiClient {
   async processReceipt(formData: FormData) {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null
     
-    const response = await fetch(`${this.baseURL}/ai/process-receipt`, {
+    const response = await fetch(`${this.baseURL}/receipts/process`, {
       method: 'POST',
       headers: {
         ...(token && { Authorization: `Bearer ${token}` }),
@@ -858,7 +858,7 @@ class ApiClient {
 
   async getReceiptHistory(params?: { page?: number; limit?: number }) {
     const queryString = params ? this.buildQueryString(params) : ''
-    return this.request<PaginatedResponse<any>>(`/ai/receipts${queryString ? `?${queryString}` : ""}`)
+    return this.request<PaginatedResponse<any>>(`/receipts/history${queryString ? `?${queryString}` : ""}`)
   }
 
   // Dashboard methods
