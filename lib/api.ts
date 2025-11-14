@@ -799,6 +799,54 @@ class ApiClient {
     }
   }
 
+  async exportBudgets(exportData: {
+    format: 'csv' | 'json' | 'pdf'
+    startDate?: string
+    endDate?: string
+    categories?: string[]
+  }) {
+    const response = await fetch(`${this.baseURL}/exports/budgets`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(exportData),
+    })
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `budgets-export.${exportData.format}`
+      return { data: { blob, filename } }
+    } else {
+      const error = await response.json()
+      return { error: error.error || 'Export failed' }
+    }
+  }
+
+  async exportGoals(exportData: {
+    format: 'csv' | 'json' | 'pdf'
+    status?: 'active' | 'completed' | 'abandoned'
+  }) {
+    const response = await fetch(`${this.baseURL}/exports/goals`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      },
+      body: JSON.stringify(exportData),
+    })
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const filename = response.headers.get('content-disposition')?.split('filename=')[1]?.replace(/"/g, '') || `goals-export.${exportData.format}`
+      return { data: { blob, filename } }
+    } else {
+      const error = await response.json()
+      return { error: error.error || 'Export failed' }
+    }
+  }
+
   async exportAllData(format: 'csv' | 'json' = 'json') {
     const response = await fetch(`${this.baseURL}/exports/all`, {
       method: 'POST',
@@ -859,6 +907,25 @@ class ApiClient {
   async getReceiptHistory(params?: { page?: number; limit?: number }) {
     const queryString = params ? this.buildQueryString(params) : ''
     return this.request<PaginatedResponse<any>>(`/receipts/history${queryString ? `?${queryString}` : ""}`)
+  }
+
+  async deleteReceipt(filename: string) {
+    return this.request<{ success: boolean; message: string }>(`/receipts/${filename}`, {
+      method: 'DELETE'
+    })
+  }
+
+  async testReceiptService() {
+    return this.request<{
+      success: boolean
+      message: string
+      features: {
+        ocr: string
+        supportedFormats: string[]
+        maxFileSize: string
+        extractedFields: string[]
+      }
+    }>('/receipts/test')
   }
 
   // Dashboard methods
