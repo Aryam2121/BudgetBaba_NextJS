@@ -1,12 +1,15 @@
 const axios = require('axios');
+const cache = require('./cache');
+const logger = require('./logger');
 
-// Currency conversion service with caching
+// Currency conversion service with Redis caching
 class CurrencyConverter {
   constructor() {
     this.rates = {};
     this.lastUpdate = null;
     this.cacheExpiry = 60 * 60 * 1000; // 1 hour
     this.baseCurrency = 'USD';
+    this.cacheKey = 'currency:rates';
     
     // API keys - use environment variable or fallback to free tier
     this.apiKey = process.env.EXCHANGE_RATE_API_KEY || null;
@@ -24,13 +27,20 @@ class CurrencyConverter {
       if (response.data && response.data.rates) {
         this.rates = response.data.rates;
         this.lastUpdate = Date.now();
-        console.log(`✅ Currency rates updated: ${Object.keys(this.rates).length} currencies`);
+        
+        // Cache in Redis for 1 hour
+        await cache.set(this.cacheKey, {
+          rates: this.rates,
+          lastUpdate: this.lastUpdate
+        }, 3600);
+        
+        logger.info(`✅ Currency rates updated: ${Object.keys(this.rates).length} currencies`);
         return true;
       }
       
       return false;
     } catch (error) {
-      console.error('❌ Failed to fetch currency rates:', error.message);
+      logger.error('❌ Failed to fetch currency rates:', error.message);
       
       // Fallback to static rates if API fails
       if (Object.keys(this.rates).length === 0) {
@@ -73,11 +83,19 @@ class CurrencyConverter {
       SAR: 3.75
     };
     this.lastUpdate = Date.now();
-    console.log('⚠️  Using fallback currency rates');
+    logger.warn('⚠️  Using fallback currency rates');
   }
 
   async getRates() {
-    // Return cached rates if still valid
+    // Try Redis cache first
+    const cached = await cache.get(this.cacheKey);
+    if (cached && cached.rates) {
+      this.rates = cached.rates;
+      this.lastUpdate = cached.lastUpdate;
+      return this.rates;
+    }
+
+    // Return memory cached rates if still valid
     if (this.rates && Object.keys(this.rates).length > 0) {
       const cacheAge = Date.now() - (this.lastUpdate || 0);
       if (cacheAge < this.cacheExpiry) {
