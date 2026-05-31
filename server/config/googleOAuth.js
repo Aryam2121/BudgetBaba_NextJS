@@ -1,5 +1,5 @@
 const { google } = require("googleapis")
-const { DEFAULT_PROD_FRONTEND, getProdFrontendUrl } = require("./appUrls")
+const { DEFAULT_PROD_FRONTEND, getProdFrontendUrl, getProdFrontendOrigins } = require("./appUrls")
 
 const DEFAULT_PROD_FRONTEND_URL = DEFAULT_PROD_FRONTEND
 
@@ -13,23 +13,7 @@ function getConfiguredFrontendUrl() {
 }
 
 function getAllowedFrontendOrigins() {
-  const origins = new Set([
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
-    DEFAULT_PROD_FRONTEND_URL,
-  ])
-
-  const configured = getConfiguredFrontendUrl()
-  if (configured) origins.add(configured)
-
-  if (process.env.ALLOWED_FRONTEND_ORIGINS) {
-    process.env.ALLOWED_FRONTEND_ORIGINS.split(",").forEach((entry) => {
-      const normalized = normalizeOrigin(entry)
-      if (normalized) origins.add(normalized)
-    })
-  }
-
-  return [...origins]
+  return getProdFrontendOrigins()
 }
 
 function isAllowedOrigin(origin) {
@@ -42,9 +26,11 @@ function resolveFrontendOrigin(req) {
   const headerOrigin = req.headers.origin
   const configured = getConfiguredFrontendUrl()
 
+  // Never use a comma-separated FRONTEND_URL as redirect origin
   const candidate = normalizeOrigin(
     queryOrigin ||
       headerOrigin ||
+      (configured && !configured.includes(",") ? configured : "") ||
       configured ||
       (process.env.NODE_ENV === "production" ? DEFAULT_PROD_FRONTEND_URL : "http://localhost:3000")
   )
