@@ -19,6 +19,7 @@ export default function GoogleCallback() {
     const handleCallback = async () => {
       const code = searchParams.get('code')
       const error = searchParams.get('error')
+      const state = searchParams.get('state')
 
       if (error) {
         console.error('Google OAuth error:', error)
@@ -35,7 +36,11 @@ export default function GoogleCallback() {
 
       try {
         // Send code to backend via API client
-        const response = await api.googleCallback(code)
+        const response = await api.googleCallback(
+          code,
+          typeof window !== 'undefined' ? window.location.origin : undefined,
+          state
+        )
 
         if (response.error || !response.data) {
           throw new Error(response.error || 'Google login failed')

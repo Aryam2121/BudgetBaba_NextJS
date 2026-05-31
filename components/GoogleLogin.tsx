@@ -12,7 +12,7 @@ export function GoogleLogin() {
     setIsLoading(true)
     try {
       // Get Google auth URL from API
-      const response = await api.getGoogleAuthUrl()
+      const response = await api.getGoogleAuthUrl(window.location.origin)
 
       if (response.error || !response.data?.authUrl) {
         throw new Error(response.error || 'Failed to get Google auth URL')

@@ -1,4 +1,22 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+const PROD_API_URL = "https://budgetbaba-nextjs.onrender.com/api"
+
+function resolveApiBaseUrl() {
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/$/, "")
+  }
+  if (typeof window !== "undefined") {
+    const host = window.location.hostname
+    if (host === "localhost" || host === "127.0.0.1") {
+      return "http://localhost:5000/api"
+    }
+  }
+  if (process.env.NODE_ENV === "production") {
+    return PROD_API_URL
+  }
+  return "http://localhost:5000/api"
+}
+
+const API_BASE_URL = resolveApiBaseUrl()
 
 interface ApiResponse<T = any> {
   data?: T
@@ -181,16 +199,17 @@ class ApiClient {
   }
 
   // Google OAuth methods
-  async getGoogleAuthUrl() {
-    return this.request<{ authUrl: string }>("/auth/google", {
+  async getGoogleAuthUrl(origin?: string) {
+    const query = origin ? `?origin=${encodeURIComponent(origin)}` : ""
+    return this.request<{ authUrl: string; redirectUri?: string }>(`/auth/google${query}`, {
       method: "GET",
     })
   }
 
-  async googleCallback(code: string) {
+  async googleCallback(code: string, origin?: string, state?: string | null) {
     return this.request<{ token: string; user: any }>("/auth/google/callback", {
       method: "POST",
-      body: JSON.stringify({ code }),
+      body: JSON.stringify({ code, origin, state }),
       retries: 0,
     })
   }

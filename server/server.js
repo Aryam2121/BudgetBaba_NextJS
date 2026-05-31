@@ -26,18 +26,13 @@ const receiptsRoutes = require("./routes/receipts")
 const app = express()
 const server = http.createServer(app)
 
-// Dynamic CORS configuration
-const allowedOrigins = process.env.NODE_ENV === 'production'
-  ? [
-      process.env.FRONTEND_URL || 'https://budgetbaba.vercel.app',
-      'https://budgetbaba.vercel.app',
-      'https://budgetbaba-nextjs.onrender.com'
-    ]
-  : [
-      'http://localhost:3000', 
-      'http://127.0.0.1:3000', 
-      'https://budgetbaba.vercel.app'
-    ]
+const { getAllowedFrontendOrigins, getRedirectUri, getConfiguredFrontendUrl } = require("./config/googleOAuth")
+const { PROD_BACKEND_URL } = require("./config/appUrls")
+
+// CORS — allow frontend origins (not the API host itself)
+const allowedOrigins = process.env.NODE_ENV === "production"
+  ? getAllowedFrontendOrigins()
+  : getAllowedFrontendOrigins()
 
 const io = socketIo(server, {
   cors: {
@@ -57,10 +52,13 @@ if (!process.env.JWT_SECRET) {
 
 if (!process.env.GOOGLE_CLIENT_ID) {
   console.warn("GOOGLE_CLIENT_ID is not defined - Google OAuth will not work")
-}
-
-if (!process.env.GOOGLE_CLIENT_SECRET) {
+} else if (!process.env.GOOGLE_CLIENT_SECRET) {
   console.warn("GOOGLE_CLIENT_SECRET is not defined - Google OAuth will not work")
+} else {
+  const frontend = getConfiguredFrontendUrl()
+  console.log(`Production API: ${PROD_BACKEND_URL}`)
+  console.log(`Frontend URL: ${frontend}`)
+  console.log(`Google OAuth redirect URI: ${getRedirectUri(frontend)}`)
 }
 
 if (!process.env.MONGODB_URI) {
