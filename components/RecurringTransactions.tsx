@@ -16,6 +16,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Repeat, Plus, Edit2, Trash2, Pause, Play, Clock, DollarSign } from 'lucide-react'
 import { api } from '@/lib/api'
+import { getListFromResponse } from '@/lib/api-utils'
 import { useToast } from '@/hooks/use-toast'
 
 interface RecurringTransaction {
@@ -62,7 +63,7 @@ const RecurringTransactions = () => {
     try {
       const response = await api.getRecurringTransactions()
       if (response.data) {
-        setTransactions(response.data.data || [])
+        setTransactions(getListFromResponse(response.data, ['transactions']))
       }
     } catch (error) {
       toast({
@@ -137,11 +138,7 @@ const RecurringTransactions = () => {
 
   const toggleTransactionStatus = async (transactionId: string, isActive: boolean) => {
     try {
-      if (isActive) {
-        await api.pauseRecurringTransaction(transactionId)
-      } else {
-        await api.resumeRecurringTransaction(transactionId)
-      }
+      await api.updateRecurringTransaction(transactionId, { isActive: !isActive })
       
       setTransactions(prev =>
         prev.map(t => t._id === transactionId ? { ...t, isActive: !isActive } : t)

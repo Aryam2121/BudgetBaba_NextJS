@@ -401,7 +401,7 @@ export default function SubscriptionTracker() {
                 return (
                   <div
                     key={sub._id}
-                    className="flex items-center gap-4 p-4 rounded-lg border hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-4 p-4 rounded-lg border hover:bg-muted/40 transition-colors"
                   >
                     <div
                       className="h-12 w-12 rounded-lg flex items-center justify-center text-white font-bold text-xl"
@@ -422,7 +422,7 @@ export default function SubscriptionTracker() {
                           {sub.status}
                         </Badge>
                         {isDueSoon && (
-                          <Badge variant="outline" className="bg-yellow-50 text-yellow-700 border-yellow-200">
+                          <Badge variant="outline" className="soft-badge-amber">
                             <AlertCircle className="h-3 w-3 mr-1" />
                             Due in {daysUntil} days
                           </Badge>

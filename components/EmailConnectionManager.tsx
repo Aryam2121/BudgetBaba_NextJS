@@ -21,7 +21,7 @@ export function EmailConnectionManager() {
     setLoading(true)
     try {
       const res = await api.getEmailStatus()
-      setStatus(res)
+      setStatus(res.data || null)
     } catch (e) {
       setStatus(null)
     } finally {
@@ -33,8 +33,10 @@ export function EmailConnectionManager() {
     setLoading(true)
     try {
       const res = await api.getOAuthUrl(provider)
-      if (res.authUrl) {
-        window.location.href = res.authUrl
+      if (res.data?.authUrl) {
+        window.location.href = res.data.authUrl
+      } else if (res.error) {
+        throw new Error(res.error)
       }
     } catch (e) {
       toast({ title: "Error", description: `Failed to connect to ${provider}`, variant: "destructive" })

@@ -19,6 +19,7 @@ import {
   Eye
 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { getListFromResponse } from '@/lib/api-utils'
 import { useToast } from '@/hooks/use-toast'
 
 interface ExportHistory {
@@ -59,7 +60,7 @@ const ExportDashboard = () => {
     try {
       const response = await api.getExportHistory()
       if (response.data) {
-        setExportHistory(response.data.data || [])
+        setExportHistory(getListFromResponse(response.data, ['exportHistory']))
       }
     } catch (error) {
       toast({
@@ -88,45 +89,47 @@ const ExportDashboard = () => {
 
       switch (exportType) {
         case 'expenses':
-          response = await api.exportExpenseData({
-            format: exportFilters.format,
-            ...filters,
-            includeAnalytics: exportFilters.includeAnalytics
+          response = await api.exportExpenses({
+            format: exportFilters.format === 'pdf' ? 'csv' : exportFilters.format,
+            startDate: exportFilters.startDate || undefined,
+            endDate: exportFilters.endDate || undefined,
+            minAmount: filters.minAmount,
+            maxAmount: filters.maxAmount,
           })
           break
         case 'analytics':
-          response = await api.exportAnalyticsReport({
-            format: exportFilters.format,
-            ...filters
+          response = await api.generateReport({
+            reportType: 'custom',
+            startDate: exportFilters.startDate || undefined,
+            endDate: exportFilters.endDate || undefined,
+            includeCharts: exportFilters.includeAnalytics,
           })
           break
         case 'budget_report':
-          response = await api.exportBudgetReport({
-            format: exportFilters.format,
-            ...filters
+          response = await api.exportBudgets({
+            format: exportFilters.format === 'json' ? 'json' : exportFilters.format === 'pdf' ? 'pdf' : 'csv',
+            startDate: exportFilters.startDate || undefined,
+            endDate: exportFilters.endDate || undefined,
+            categories: exportFilters.categories,
           })
           break
         case 'full_report':
-          response = await api.exportFullReport({
-            format: 'zip',
-            ...filters
-          })
+          response = await api.exportAllData(exportFilters.format === 'json' ? 'json' : 'json')
           break
       }
 
+      if (response?.error) {
+        throw new Error(response.error)
+      }
+
       // Handle file download
-      if (response.data) {
-        const blob = new Blob([response.data], { 
-          type: exportFilters.format === 'csv' ? 'text/csv' : 
-                exportFilters.format === 'json' ? 'application/json' : 
-                exportFilters.format === 'pdf' ? 'application/pdf' : 'application/zip'
-        })
+      if (response?.data?.blob) {
+        const blob = response.data.blob
+        const filename = response.data.filename || `${exportType}-${new Date().toISOString().split('T')[0]}.csv`
         const url = window.URL.createObjectURL(blob)
         const link = document.createElement('a')
         link.href = url
-        link.download = `${exportType}-${new Date().toISOString().split('T')[0]}.${
-          exportType === 'full_report' ? 'zip' : exportFilters.format
-        }`
+        link.download = filename
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
@@ -150,44 +153,21 @@ const ExportDashboard = () => {
     }
   }
 
-  const downloadFromHistory = async (exportId: string) => {
-    try {
-      const response = await api.downloadExport(exportId)
-      
-      if (response.data) {
-        const blob = new Blob([response.data])
-        const url = window.URL.createObjectURL(blob)
-        const link = document.createElement('a')
-        link.href = url
-        link.download = `export-${exportId}.zip`
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-        window.URL.revokeObjectURL(url)
-        
-        toast({
-          title: 'Success',
-          description: 'Export downloaded successfully'
-        })
-      }
-    } catch (error) {
-      toast({
-        title: 'Error',
-        description: 'Failed to download export',
-        variant: 'destructive'
-      })
-    }
+  const downloadFromHistory = async (exportItem: ExportHistory) => {
+    toast({
+      title: 'Info',
+      description: 'Run a new export with the same filters to download again.',
+    })
   }
 
   const deleteExport = async (exportId: string) => {
     if (!confirm('Are you sure you want to delete this export?')) return
 
     try {
-      await api.deleteExport(exportId)
       setExportHistory(prev => prev.filter(e => e._id !== exportId))
       toast({
         title: 'Success',
-        description: 'Export deleted successfully'
+        description: 'Export removed from history'
       })
     } catch (error) {
       toast({
@@ -498,7 +478,7 @@ const ExportDashboard = () => {
                         
                         {exportItem.status === 'completed' && (
                           <Button
-                            onClick={() => downloadFromHistory(exportItem._id)}
+                            onClick={() => downloadFromHistory(exportItem)}
                             variant="outline"
                             size="sm"
                           >

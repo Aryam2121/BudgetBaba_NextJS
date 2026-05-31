@@ -311,11 +311,11 @@ export default function SplitsPage() {
         <div className="mb-6">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800 flex items-center gap-2">
+              <h1 className="text-3xl font-bold text-foreground flex items-center gap-2">
                 <Users className="h-8 w-8 text-blue-500" />
                 Split Expenses
               </h1>
-              <p className="text-slate-600 mt-1">Manage shared expenses with friends and family</p>
+              <p className="text-muted-foreground mt-1">Manage shared expenses with friends and family</p>
             </div>
             <div className="flex items-center space-x-3">
               {/* Email status will be shown per split */}
@@ -577,7 +577,7 @@ export default function SplitsPage() {
 
                               {/* Other Participants */}
                               {split.participants.map((participant: any, index: number) => (
-                                <div key={index} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg">
+                                <div key={index} className="flex items-center justify-between p-2 bg-muted/40 rounded-lg">
                                   <div className="flex items-center gap-2 flex-1 min-w-0">
                                     <Avatar className="h-6 w-6 flex-shrink-0">
                                       <AvatarFallback className="text-xs">

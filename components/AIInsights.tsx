@@ -60,20 +60,20 @@ export default function AIInsights() {
 
   const getSeverityColor = (severity: string) => {
     switch (severity) {
-      case 'high': return 'text-red-600 bg-red-50 border-red-200'
-      case 'medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200'
-      case 'low': return 'text-blue-600 bg-blue-50 border-blue-200'
-      default: return 'text-gray-600 bg-gray-50 border-gray-200'
+      case 'high': return 'alert-severity-high'
+      case 'medium': return 'alert-severity-medium'
+      case 'low': return 'alert-severity-low'
+      default: return 'border-border bg-muted/40 text-foreground'
     }
   }
 
   const getDifficultyBadge = (difficulty: string) => {
-    const colors = {
-      easy: 'bg-green-100 text-green-800',
-      medium: 'bg-yellow-100 text-yellow-800',
-      hard: 'bg-red-100 text-red-800'
+    const colors: Record<string, string> = {
+      easy: 'soft-badge-green',
+      medium: 'soft-badge-amber',
+      hard: 'soft-badge-red',
     }
-    return colors[difficulty as keyof typeof colors] || colors.medium
+    return colors[difficulty] || 'soft-badge-amber'
   }
 
   if (loading) {
@@ -125,7 +125,7 @@ export default function AIInsights() {
 
       {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
+        <Card className="dashboard-panel">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -137,7 +137,7 @@ export default function AIInsights() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dashboard-panel">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -149,7 +149,7 @@ export default function AIInsights() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dashboard-panel">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -161,7 +161,7 @@ export default function AIInsights() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="dashboard-panel">
           <CardContent className="pt-6">
             <div className="flex items-center justify-between">
               <div>
@@ -178,7 +178,7 @@ export default function AIInsights() {
 
       {/* Tabs */}
       <Tabs defaultValue="alerts" className="w-full">
-        <TabsList className="grid w-full grid-cols-4">
+        <TabsList className="grid w-full grid-cols-4 dashboard-panel p-1 h-auto">
           <TabsTrigger value="alerts" className="flex items-center gap-2">
             <AlertTriangle className="h-4 w-4" />
             Alerts ({insights?.insights?.alerts?.length || 0})
@@ -199,10 +199,10 @@ export default function AIInsights() {
 
         {/* Alerts Tab */}
         <TabsContent value="alerts" className="space-y-4">
-          <Card>
+          <Card className="dashboard-panel">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <AlertTriangle className="h-5 w-5 text-red-600" />
+                <AlertTriangle className="h-5 w-5 text-red-500" />
                 Budget Alerts & Warnings
               </CardTitle>
               <CardDescription>
@@ -238,7 +238,7 @@ export default function AIInsights() {
 
           {/* Trends */}
           {insights?.insights?.trends?.length > 0 && (
-            <Card>
+            <Card className="dashboard-panel">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <TrendingUp className="h-5 w-5" />
@@ -247,7 +247,7 @@ export default function AIInsights() {
               </CardHeader>
               <CardContent className="space-y-3">
                 {insights.insights.trends.map((trend: any, index: number) => (
-                  <div key={index} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <div key={index} className="flex items-center gap-3 p-3 surface-subtle">
                     {trend.type === 'increasing' ? (
                       <TrendingUp className="h-5 w-5 text-red-600" />
                     ) : (
@@ -268,10 +268,10 @@ export default function AIInsights() {
 
         {/* Recommendations Tab */}
         <TabsContent value="recommendations" className="space-y-4">
-          <Card>
+          <Card className="dashboard-panel">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Lightbulb className="h-5 w-5 text-yellow-600" />
+                <Lightbulb className="h-5 w-5 text-amber-500" />
                 Smart Recommendations
               </CardTitle>
               <CardDescription>
@@ -280,7 +280,7 @@ export default function AIInsights() {
             </CardHeader>
             <CardContent className="space-y-3">
               {insights?.insights?.recommendations?.map((rec: any, index: number) => (
-                <div key={index} className="p-4 border rounded-lg hover:bg-gray-50 transition-colors">
+                <div key={index} className="p-4 surface-subtle hover:bg-muted/50 transition-colors">
                   <div className="flex items-start justify-between mb-2">
                     <h4 className="font-semibold flex items-center gap-2">
                       <Zap className="h-4 w-4 text-yellow-600" />
@@ -304,10 +304,10 @@ export default function AIInsights() {
 
           {/* Budget Recommendations */}
           {recommendations?.recommendations?.length > 0 && (
-            <Card>
+            <Card className="dashboard-panel">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5 text-blue-600" />
+                  <Target className="h-5 w-5 text-blue-500" />
                   Budget Recommendations
                 </CardTitle>
                 <CardDescription>
@@ -317,7 +317,7 @@ export default function AIInsights() {
               <CardContent>
                 <div className="space-y-3">
                   {recommendations.recommendations.slice(0, 5).map((rec: any, index: number) => (
-                    <div key={index} className="flex items-center justify-between p-3 border rounded-lg">
+                    <div key={index} className="flex items-center justify-between p-3 surface-subtle">
                       <div className="flex-1">
                         <p className="font-medium">{rec.category}</p>
                         <p className="text-xs text-muted-foreground">{rec.reasoning}</p>
@@ -331,9 +331,9 @@ export default function AIInsights() {
                     </div>
                   ))}
                 </div>
-                <div className="mt-4 p-3 bg-blue-50 rounded-lg">
-                  <p className="text-sm font-medium">Total Recommended Budget</p>
-                  <p className="text-2xl font-bold text-blue-600">
+                <div className="mt-4 stat-highlight-blue">
+                  <p className="text-sm font-medium text-muted-foreground">Total Recommended Budget</p>
+                  <p className="text-2xl font-bold text-foreground">
                     {formatAmount(recommendations.totalRecommendedBudget)}
                   </p>
                 </div>
@@ -344,10 +344,10 @@ export default function AIInsights() {
 
         {/* Anomalies Tab */}
         <TabsContent value="anomalies" className="space-y-4">
-          <Card>
+          <Card className="dashboard-panel">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Brain className="h-5 w-5 text-purple-600" />
+                <Brain className="h-5 w-5 text-violet-500" />
                 Unusual Spending Detected
               </CardTitle>
               <CardDescription>
@@ -389,10 +389,10 @@ export default function AIInsights() {
 
         {/* Savings Tab */}
         <TabsContent value="savings" className="space-y-4">
-          <Card>
+          <Card className="dashboard-panel">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <PiggyBank className="h-5 w-5 text-green-600" />
+                <PiggyBank className="h-5 w-5 text-emerald-500" />
                 Savings Opportunities
               </CardTitle>
               <CardDescription>
@@ -400,9 +400,9 @@ export default function AIInsights() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-                <p className="text-sm text-green-800 font-medium">Total Potential Savings</p>
-                <p className="text-3xl font-bold text-green-600">
+              <div className="mb-6 stat-highlight-green">
+                <p className="text-sm font-medium text-muted-foreground">Total Potential Savings</p>
+                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
                   {formatAmount(opportunities?.totalPotentialSavings || 0)}/month
                 </p>
               </div>
@@ -415,7 +415,7 @@ export default function AIInsights() {
                   </div>
                 ) : (
                   opportunities?.opportunities?.map((opp: any, index: number) => (
-                    <div key={index} className="p-4 border rounded-lg hover:shadow-md transition-shadow">
+                    <div key={index} className="p-4 surface-subtle hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between mb-2">
                         <div className="flex-1">
                           <h4 className="font-semibold text-lg">{opp.title}</h4>

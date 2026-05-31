@@ -155,7 +155,7 @@ export default function UploadExpensesPage() {
   if (uploadResult) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-muted/40 py-8">
           <div className="container mx-auto px-4 max-w-2xl">
             <Card>
               <CardContent className="pt-6">
@@ -215,8 +215,8 @@ export default function UploadExpensesPage() {
       <DashboardLayout>
         {/* Enhanced Header with gradient background */}
         <div className="mb-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-green-500/10 via-blue-500/10 to-purple-500/10 rounded-2xl"></div>
-          <div className="relative p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
+          <div className="absolute inset-0 page-hero-glow rounded-2xl"></div>
+          <div className="relative p-8 page-hero rounded-2xl shadow-xl p-6 sm:p-8">
             <div className="flex items-center justify-between">
               <div className="space-y-3">
                 <div className="flex items-center space-x-3">
@@ -224,10 +224,10 @@ export default function UploadExpensesPage() {
                     <CloudUpload className="h-8 w-8 text-white" />
                   </div>
                   <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
+                    <h1 className="text-4xl font-bold page-title">
                       Upload Expenses
                     </h1>
-                    <p className="text-slate-600 text-lg">
+                    <p className="text-muted-foreground text-lg">
                       Import multiple expenses from CSV files with smart mapping
                     </p>
                   </div>
@@ -235,15 +235,15 @@ export default function UploadExpensesPage() {
                 
                 {/* Quick Info Cards */}
                 <div className="flex flex-wrap gap-3 mt-6">
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
+                  <Badge variant="outline" className="soft-badge-green px-3 py-1">
                     <Upload className="h-4 w-4 mr-2" />
                     Bulk Import
                   </Badge>
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1">
+                  <Badge variant="outline" className="soft-badge-blue px-3 py-1">
                     <Database className="h-4 w-4 mr-2" />
                     Smart Mapping
                   </Badge>
-                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1">
+                  <Badge variant="outline" className="soft-badge-purple px-3 py-1">
                     <Zap className="h-4 w-4 mr-2" />
                     Auto-categorization
                   </Badge>
@@ -265,33 +265,33 @@ export default function UploadExpensesPage() {
 
         {/* Upload Features */}
         <div className="grid gap-4 md:grid-cols-3 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200 hover:shadow-lg transition-all duration-300">
+          <Card className="feature-tile feature-tile-blue border-0 shadow-none hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6 text-center">
               <Clock className="h-8 w-8 text-blue-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-slate-800 mb-2">Save Time</h3>
-              <p className="text-sm text-slate-600">Import hundreds of expenses in seconds</p>
+              <h3 className="font-semibold text-foreground mb-2">Save Time</h3>
+              <p className="text-sm text-muted-foreground">Import hundreds of expenses in seconds</p>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200 hover:shadow-lg transition-all duration-300">
+          <Card className="feature-tile feature-tile-green border-0 shadow-none hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6 text-center">
               <Database className="h-8 w-8 text-green-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-slate-800 mb-2">Smart Detection</h3>
-              <p className="text-sm text-slate-600">Automatically detect column formats</p>
+              <h3 className="font-semibold text-foreground mb-2">Smart Detection</h3>
+              <p className="text-sm text-muted-foreground">Automatically detect column formats</p>
             </CardContent>
           </Card>
           
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 hover:shadow-lg transition-all duration-300">
+          <Card className="feature-tile feature-tile-purple border-0 shadow-none hover:shadow-lg transition-all duration-300">
             <CardContent className="p-6 text-center">
               <Users className="h-8 w-8 text-purple-600 mx-auto mb-3" />
-              <h3 className="font-semibold text-slate-800 mb-2">Team Ready</h3>
-              <p className="text-sm text-slate-600">Support for multiple expense formats</p>
+              <h3 className="font-semibold text-foreground mb-2">Team Ready</h3>
+              <p className="text-sm text-muted-foreground">Support for multiple expense formats</p>
             </CardContent>
           </Card>
         </div>
 
         <div className="max-w-2xl mx-auto">
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader>
               <div className="flex items-center space-x-3">
                 <div className="p-2 bg-green-100 rounded-lg">
@@ -305,10 +305,10 @@ export default function UploadExpensesPage() {
             </CardHeader>
             <CardContent className="space-y-6">
               {/* CSV Format Guide */}
-              <Alert className="bg-amber-50 border-amber-200">
+              <Alert className="tip-banner border-amber-500/20">
                 <AlertCircle className="h-4 w-4 text-amber-600" />
                 <AlertDescription>
-                  <strong className="text-amber-800">CSV Format:</strong> <span className="text-amber-700">Your file should have columns for amount, date, vendor (optional), and
+                  <strong className="tip-banner-title">CSV Format:</strong> <span className="tip-banner-text">Your file should have columns for amount, date, vendor (optional), and
                   note (optional). Common column names like "cost", "price", "store", "merchant", "description" are
                   automatically recognized.</span>
                 </AlertDescription>

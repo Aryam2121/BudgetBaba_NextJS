@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuth } from '@/contexts/AuthContext'
 import { toast } from 'sonner'
@@ -10,8 +10,12 @@ export default function GoogleCallback() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const { loginWithToken } = useAuth()
+  const handledRef = useRef(false)
 
   useEffect(() => {
+    if (handledRef.current) return
+    handledRef.current = true
+
     const handleCallback = async () => {
       const code = searchParams.get('code')
       const error = searchParams.get('error')

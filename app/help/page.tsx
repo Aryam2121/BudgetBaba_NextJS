@@ -340,8 +340,8 @@ export default function HelpPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Help & Support</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Help & Support</h1>
+              <p className="text-muted-foreground mt-1">
                 Find answers, tutorials, and get support for your expense tracking needs
               </p>
             </div>
@@ -349,37 +349,37 @@ export default function HelpPage() {
 
           {/* Quick Stats */}
           <div className="grid gap-6 md:grid-cols-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <HelpCircle className="h-8 w-8 text-blue-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">FAQs</p>
-                    <p className="text-2xl font-bold text-slate-800">{faqs.length}</p>
+                    <p className="text-sm font-medium text-muted-foreground">FAQs</p>
+                    <p className="text-2xl font-bold text-foreground">{faqs.length}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <BookOpen className="h-8 w-8 text-green-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Tutorials</p>
-                    <p className="text-2xl font-bold text-slate-800">{tutorials.length}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Tutorials</p>
+                    <p className="text-2xl font-bold text-foreground">{tutorials.length}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <MessageCircle className="h-8 w-8 text-purple-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Open Tickets</p>
-                    <p className="text-2xl font-bold text-slate-800">
+                    <p className="text-sm font-medium text-muted-foreground">Open Tickets</p>
+                    <p className="text-2xl font-bold text-foreground">
                       {tickets.filter(t => t.status === 'open').length}
                     </p>
                   </div>
@@ -387,13 +387,13 @@ export default function HelpPage() {
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <Clock className="h-8 w-8 text-orange-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Avg Response</p>
-                    <p className="text-2xl font-bold text-slate-800">2h</p>
+                    <p className="text-sm font-medium text-muted-foreground">Avg Response</p>
+                    <p className="text-2xl font-bold text-foreground">2h</p>
                   </div>
                 </div>
               </CardContent>
@@ -401,7 +401,7 @@ export default function HelpPage() {
           </div>
 
           {/* Search and Filter */}
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+          <Card className="dashboard-panel">
             <CardContent className="p-6">
               <div className="flex flex-col sm:flex-row gap-4">
                 <div className="flex-1">
@@ -437,7 +437,7 @@ export default function HelpPage() {
 
           {/* Main Content */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-white/60 backdrop-blur-sm">
+            <TabsList className="dashboard-panel">
               <TabsTrigger value="faq">
                 <HelpCircle className="h-4 w-4 mr-2" />
                 FAQs
@@ -457,7 +457,7 @@ export default function HelpPage() {
             </TabsList>
 
             <TabsContent value="faq" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle>Frequently Asked Questions</CardTitle>
                   <CardDescription>
@@ -485,7 +485,7 @@ export default function HelpPage() {
                           </AccordionTrigger>
                           <AccordionContent className="px-4 pb-4">
                             <div className="space-y-4">
-                              <p className="text-slate-700">{faq.answer}</p>
+                              <p className="text-foreground/90">{faq.answer}</p>
                               
                               <div className="flex items-center justify-between border-t pt-3">
                                 <div className="flex flex-wrap gap-2">
@@ -524,7 +524,7 @@ export default function HelpPage() {
                   ) : (
                     <div className="text-center py-8">
                       <Search className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-slate-600 mb-2">No results found</h3>
+                      <h3 className="text-lg font-medium text-muted-foreground mb-2">No results found</h3>
                       <p className="text-slate-500">Try adjusting your search terms or category filter</p>
                     </div>
                   )}
@@ -535,7 +535,7 @@ export default function HelpPage() {
             <TabsContent value="tutorials" className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 {filteredTutorials.map((tutorial) => (
-                  <Card key={tutorial.id} className="bg-white/60 backdrop-blur-sm border-white/20">
+                  <Card key={tutorial.id} className="dashboard-panel">
                     <CardHeader>
                       <div className="flex items-start justify-between">
                         <div>
@@ -550,7 +550,7 @@ export default function HelpPage() {
                       </div>
                       
                       <div className="flex items-center space-x-4 mt-3">
-                        <div className="flex items-center space-x-1 text-sm text-slate-600">
+                        <div className="flex items-center space-x-1 text-sm text-muted-foreground">
                           <Clock className="h-4 w-4" />
                           <span>{tutorial.duration}</span>
                         </div>
@@ -571,7 +571,7 @@ export default function HelpPage() {
                           <h4 className="font-medium text-sm mb-2">Steps:</h4>
                           <ul className="space-y-1">
                             {tutorial.steps.slice(0, 3).map((step, index) => (
-                              <li key={index} className="text-sm text-slate-600 flex items-center">
+                              <li key={index} className="text-sm text-muted-foreground flex items-center">
                                 <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs flex items-center justify-center mr-2 shrink-0">
                                   {index + 1}
                                 </span>
@@ -605,10 +605,10 @@ export default function HelpPage() {
               </div>
               
               {filteredTutorials.length === 0 && (
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardContent className="p-12 text-center">
                     <BookOpen className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">No tutorials found</h3>
+                    <h3 className="text-lg font-medium text-muted-foreground mb-2">No tutorials found</h3>
                     <p className="text-slate-500">Try adjusting your search terms or category filter</p>
                   </CardContent>
                 </Card>
@@ -618,7 +618,7 @@ export default function HelpPage() {
             <TabsContent value="support" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Submit New Ticket */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Submit Support Ticket</CardTitle>
                     <CardDescription>
@@ -694,7 +694,7 @@ export default function HelpPage() {
                 </Card>
 
                 {/* Your Tickets */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Your Support Tickets</CardTitle>
                     <CardDescription>
@@ -744,7 +744,7 @@ export default function HelpPage() {
             <TabsContent value="contact" className="space-y-6">
               <div className="grid gap-6 md:grid-cols-2">
                 {/* Contact Information */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Get in Touch</CardTitle>
                     <CardDescription>
@@ -756,7 +756,7 @@ export default function HelpPage() {
                       <Mail className="h-6 w-6 text-blue-500 mt-1" />
                       <div>
                         <h3 className="font-semibold">Email Support</h3>
-                        <p className="text-sm text-slate-600 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           Get help via email, typically responds within 2 hours
                         </p>
                         <Button variant="outline" size="sm">
@@ -770,7 +770,7 @@ export default function HelpPage() {
                       <MessageCircle className="h-6 w-6 text-green-500 mt-1" />
                       <div>
                         <h3 className="font-semibold">Live Chat</h3>
-                        <p className="text-sm text-slate-600 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           Chat with our support team in real-time
                         </p>
                         <Button variant="outline" size="sm">
@@ -784,7 +784,7 @@ export default function HelpPage() {
                       <Phone className="h-6 w-6 text-orange-500 mt-1" />
                       <div>
                         <h3 className="font-semibold">Phone Support</h3>
-                        <p className="text-sm text-slate-600 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           Call us for urgent issues (Mon-Fri 9AM-6PM EST)
                         </p>
                         <Button variant="outline" size="sm">
@@ -798,7 +798,7 @@ export default function HelpPage() {
                       <ExternalLink className="h-6 w-6 text-purple-500 mt-1" />
                       <div>
                         <h3 className="font-semibold">Community Forum</h3>
-                        <p className="text-sm text-slate-600 mb-2">
+                        <p className="text-sm text-muted-foreground mb-2">
                           Connect with other users and share tips
                         </p>
                         <Button variant="outline" size="sm">
@@ -811,7 +811,7 @@ export default function HelpPage() {
                 </Card>
 
                 {/* Quick Resources */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Quick Resources</CardTitle>
                     <CardDescription>

@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { DashboardLayout } from '@/components/DashboardLayout'
-import { formatCurrency } from '@/lib/currency'
+import { useCurrency } from '@/contexts/CurrencyContext'
+import { getExpensesList, getExpenseTotal } from '@/lib/api-utils'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -49,20 +50,19 @@ interface Expense {
 
 const categories = [
   'All Categories',
-  'Food & Dining',
-  'Transportation',
+  'Food',
+  'Transport',
   'Shopping',
   'Entertainment',
-  'Bills & Utilities',
+  'Bills',
   'Healthcare',
   'Education',
-  'Travel',
-  'Groceries',
   'Other'
 ]
 
 export default function ExpensesPage() {
   const { user } = useAuth()
+  const { formatAmount } = useCurrency()
   const [expenses, setExpenses] = useState<Expense[]>([])
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -73,18 +73,27 @@ export default function ExpensesPage() {
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
   const [totalAmount, setTotalAmount] = useState(0)
   const [filteredCount, setFilteredCount] = useState(0)
+  const [page, setPage] = useState(1)
+  const [totalExpenses, setTotalExpenses] = useState(0)
+  const pageSize = 50
+
+  useEffect(() => {
+    if (user) {
+      setPage(1)
+    }
+  }, [user, selectedCategory, dateFrom, dateTo, searchQuery])
 
   useEffect(() => {
     if (user) {
       fetchExpenses()
     }
-  }, [user, selectedCategory, dateFrom, dateTo])
+  }, [user, selectedCategory, dateFrom, dateTo, page])
 
   const fetchExpenses = async () => {
     try {
       setLoading(true)
       
-      const filters: any = {}
+      const filters: any = { page, limit: pageSize }
       
       if (selectedCategory && selectedCategory !== 'All Categories') {
         filters.category = selectedCategory
@@ -101,11 +110,10 @@ export default function ExpensesPage() {
       const response = await api.getExpenses(filters)
       
       if (response.data) {
-        const responseData = response.data as any
-        const expensesData = Array.isArray(responseData) ? responseData : responseData.expenses || []
+        const expensesData = getExpensesList(response.data)
         setExpenses(expensesData)
+        setTotalExpenses(getExpenseTotal(response.data))
         
-        // Calculate totals
         const total = expensesData.reduce((sum: number, expense: Expense) => sum + expense.amount, 0)
         setTotalAmount(total)
         setFilteredCount(expensesData.length)
@@ -168,6 +176,22 @@ export default function ExpensesPage() {
     }
   }
 
+  const handleDeleteExpense = async (expenseId: string) => {
+    if (!confirm('Delete this expense?')) return
+
+    try {
+      const response = await api.deleteExpense(expenseId)
+      if (response.error) {
+        throw new Error(response.error)
+      }
+      setExpenses((prev) => prev.filter((expense) => expense._id !== expenseId))
+      toast.success('Expense deleted')
+    } catch (error) {
+      console.error('Error deleting expense:', error)
+      toast.error('Failed to delete expense')
+    }
+  }
+
   const clearFilters = () => {
     setSearchQuery('')
     setSelectedCategory('All Categories')
@@ -178,7 +202,7 @@ export default function ExpensesPage() {
   const ExpensesTableSkeleton = () => (
     <div className="space-y-3">
       {[...Array(10)].map((_, i) => (
-        <div key={i} className="flex items-center space-x-4 p-4 bg-white/40 rounded-lg">
+        <div key={i} className="flex items-center space-x-4 p-4 surface-subtle">
           <Skeleton className="h-4 w-20" />
           <Skeleton className="h-4 flex-1" />
           <Skeleton className="h-4 w-24" />
@@ -197,9 +221,9 @@ export default function ExpensesPage() {
           {/* Header */}
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">All Expenses</h1>
-              <p className="text-slate-600 mt-1 text-sm sm:text-base">
-                {loading ? 'Loading...' : `${filteredCount} expenses • Total: ${formatCurrency(totalAmount, 'USD')}`}
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground">All Expenses</h1>
+              <p className="text-muted-foreground mt-1 text-sm sm:text-base">
+                {loading ? 'Loading...' : `${filteredCount} expenses • Total: ${formatAmount(totalAmount)}`}
               </p>
             </div>
             
@@ -211,7 +235,7 @@ export default function ExpensesPage() {
                 </Button>
               </Link>
               <Link href="/expenses/new">
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 w-full sm:w-auto">
+                <Button className="brand-btn w-full sm:w-auto">
                   <Plus className="h-4 w-4 mr-2" />
                   Add Expense
                 </Button>
@@ -221,51 +245,51 @@ export default function ExpensesPage() {
 
           {/* Stats Cards */}
           <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-4">
                 <div className="flex items-center">
                   <Receipt className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 flex-shrink-0" />
                   <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Total Expenses</p>
-                    <p className="text-lg sm:text-2xl font-bold text-slate-800">{filteredCount}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Total Expenses</p>
+                    <p className="text-lg sm:text-2xl font-bold text-foreground">{filteredCount}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-4">
                 <div className="flex items-center">
                   <DollarSign className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
                   <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Total Amount</p>
-                                        <p className="text-lg sm:text-2xl font-bold text-slate-800">{formatCurrency(totalAmount, 'USD')}</p>
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Total Amount</p>
+                                        <p className="text-lg sm:text-2xl font-bold text-foreground">{formatAmount(totalAmount)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-4">
                 <div className="flex items-center">
                   <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 flex-shrink-0" />
                   <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Average</p>
-                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
-                      {filteredCount > 0 ? formatCurrency(totalAmount / filteredCount, 'USD') : formatCurrency(0, 'USD')}
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Average</p>
+                    <p className="text-lg sm:text-2xl font-bold text-foreground">
+                      {filteredCount > 0 ? formatAmount(totalAmount / filteredCount) : formatAmount(0)}
                     </p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-4">
                 <div className="flex items-center">
                   <TrendingDown className="h-6 w-6 sm:h-8 sm:w-8 text-orange-500 flex-shrink-0" />
                   <div className="ml-3 sm:ml-4 min-w-0">
-                    <p className="text-xs sm:text-sm font-medium text-slate-600 truncate">Categories</p>
-                    <p className="text-lg sm:text-2xl font-bold text-slate-800">
+                    <p className="text-xs sm:text-sm font-medium text-muted-foreground truncate">Categories</p>
+                    <p className="text-lg sm:text-2xl font-bold text-foreground">
                       {new Set(expenses.map(e => e.category)).size}
                     </p>
                   </div>
@@ -275,7 +299,7 @@ export default function ExpensesPage() {
           </div>
 
           {/* Filters */}
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+          <Card className="dashboard-panel">
             <CardHeader>
               <CardTitle className="text-lg">Filters & Search</CardTitle>
             </CardHeader>
@@ -360,7 +384,7 @@ export default function ExpensesPage() {
           </Card>
 
           {/* Expenses Table/Cards */}
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+          <Card className="dashboard-panel">
             <CardHeader>
               <CardTitle className="text-lg">Expense Details</CardTitle>
               <CardDescription>
@@ -405,7 +429,7 @@ export default function ExpensesPage() {
                       </TableHeader>
                       <TableBody>
                         {filteredAndSortedExpenses.map((expense) => (
-                          <TableRow key={expense._id} className="hover:bg-slate-50/50">
+                          <TableRow key={expense._id} className="hover:bg-muted/40">
                             <TableCell className="font-medium">
                               {format(new Date(expense.date), 'MMM dd, yyyy')}
                             </TableCell>
@@ -423,7 +447,7 @@ export default function ExpensesPage() {
                               {expense.vendor || '-'}
                             </TableCell>
                             <TableCell className="text-right font-bold">
-                              {formatCurrency(expense.amount, 'USD')}
+                              {formatAmount(expense.amount)}
                             </TableCell>
                             <TableCell className="text-right">
                               <div className="flex items-center justify-end space-x-2">
@@ -433,7 +457,12 @@ export default function ExpensesPage() {
                                 <Button variant="ghost" size="sm">
                                   <Edit className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700"
+                                  onClick={() => handleDeleteExpense(expense._id)}
+                                >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -447,8 +476,8 @@ export default function ExpensesPage() {
                   {/* Mobile Card View */}
                   <div className="lg:hidden space-y-4">
                     {/* Mobile Sort Controls */}
-                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
-                      <span className="text-sm font-medium text-slate-600">Sort by:</span>
+                    <div className="flex items-center justify-between p-4 bg-muted/40 rounded-lg">
+                      <span className="text-sm font-medium text-muted-foreground">Sort by:</span>
                       <div className="flex items-center space-x-2">
                         <Button
                           variant={sortField === 'date' ? 'default' : 'ghost'}
@@ -478,7 +507,7 @@ export default function ExpensesPage() {
                     {filteredAndSortedExpenses.map((expense, index) => (
                       <Card 
                         key={expense._id} 
-                        className="bg-white/40 hover:bg-white/60 transition-colors cursor-pointer"
+                        className="bg-muted/30 hover:bg-muted/50 transition-colors cursor-pointer"
                         style={{ animationDelay: `${index * 50}ms` }}
                       >
                         <CardContent className="p-4">
@@ -488,7 +517,7 @@ export default function ExpensesPage() {
                                 <Receipt className="h-5 w-5 text-blue-600" />
                               </div>
                               <div>
-                                <p className="font-medium text-slate-800 truncate">
+                                <p className="font-medium text-foreground truncate">
                                   {expense.description || expense.note || 'No description'}
                                 </p>
                                 <p className="text-sm text-slate-500">
@@ -497,8 +526,8 @@ export default function ExpensesPage() {
                               </div>
                             </div>
                             <div className="text-right">
-                              <p className="font-bold text-lg text-slate-800">
-                                {formatCurrency(expense.amount, 'USD')}
+                              <p className="font-bold text-lg text-foreground">
+                                {formatAmount(expense.amount)}
                               </p>
                               <Badge variant="secondary" className="bg-blue-100 text-blue-800 text-xs">
                                 {expense.category}
@@ -507,7 +536,7 @@ export default function ExpensesPage() {
                           </div>
                           
                           <div className="flex items-center justify-between">
-                            <div className="text-sm text-slate-600">
+                            <div className="text-sm text-muted-foreground">
                               {expense.vendor && (
                                 <span>Vendor: {expense.vendor}</span>
                               )}
@@ -519,20 +548,51 @@ export default function ExpensesPage() {
                               <Button variant="ghost" size="sm">
                                 <Edit className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="sm" className="text-red-600 hover:text-red-700">
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="text-red-600 hover:text-red-700"
+                                  onClick={() => handleDeleteExpense(expense._id)}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
                             </div>
                           </div>
                         </CardContent>
                       </Card>
                     ))}
                   </div>
+
+                  {totalExpenses > pageSize && (
+                    <div className="flex items-center justify-between pt-4 border-t">
+                      <p className="text-sm text-muted-foreground">
+                        Page {page} of {Math.ceil(totalExpenses / pageSize)} ({totalExpenses} total)
+                      </p>
+                      <div className="flex gap-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={page <= 1}
+                          onClick={() => setPage((p) => Math.max(1, p - 1))}
+                        >
+                          Previous
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={page >= Math.ceil(totalExpenses / pageSize)}
+                          onClick={() => setPage((p) => p + 1)}
+                        >
+                          Next
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </>
               ) : (
                 <div className="text-center py-8">
                   <Receipt className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-slate-600 mb-2">No expenses found</h3>
+                  <h3 className="text-lg font-medium text-muted-foreground mb-2">No expenses found</h3>
                   <p className="text-slate-500 text-sm">
                     {searchQuery || selectedCategory !== 'All Categories' || dateFrom || dateTo
                       ? 'Try adjusting your filters'
@@ -540,7 +600,7 @@ export default function ExpensesPage() {
                   </p>
                   {!searchQuery && selectedCategory === 'All Categories' && !dateFrom && !dateTo && (
                     <Link href="/expenses/new" className="mt-4 inline-block">
-                      <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                      <Button className="brand-btn">
                         <Plus className="h-4 w-4 mr-2" />
                         Add Your First Expense
                       </Button>

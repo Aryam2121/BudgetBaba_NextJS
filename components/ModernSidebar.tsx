@@ -8,6 +8,7 @@ import { Badge } from '@/components/ui/badge'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { useAuth } from '@/contexts/AuthContext'
 import { cn } from '@/lib/utils'
+import { Logo } from '@/components/brand/Logo'
 import {
   LayoutDashboard,
   Receipt,
@@ -44,6 +45,7 @@ interface SidebarProps {
   isCollapsed: boolean
   isMobileMenuOpen: boolean
   onToggle: () => void
+  onMobileMenuToggle: () => void
   onMobileMenuClose: () => void
 }
 
@@ -67,7 +69,7 @@ const navigationItems = [
         title: "Notifications",
         href: "/notifications",
         icon: Bell,
-        badge: 2 // Unread notifications
+        badge: null
       }
     ]
   },
@@ -136,7 +138,7 @@ const navigationItems = [
         title: "Expense Splits",
         href: "/splits",
         icon: Users,
-        badge: 3 // Pending splits
+        badge: null
       },
       {
         title: "Groups",
@@ -188,6 +190,7 @@ export function ModernSidebar({
   isCollapsed, 
   isMobileMenuOpen, 
   onToggle, 
+  onMobileMenuToggle,
   onMobileMenuClose 
 }: SidebarProps) {
   const pathname = usePathname()
@@ -200,7 +203,7 @@ export function ModernSidebar({
         variant="ghost"
         size="sm"
         className="fixed top-4 left-4 z-50 md:hidden bg-background/90 backdrop-blur-sm shadow-lg"
-        onClick={() => onToggle()}
+        onClick={onMobileMenuToggle}
       >
         {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
       </Button>
@@ -216,7 +219,7 @@ export function ModernSidebar({
       {/* Sidebar */}
       <aside 
         className={cn(
-          "fixed left-0 top-0 h-full bg-background/95 backdrop-blur-xl border-r border-border transition-all duration-300 z-50",
+          "fixed left-0 top-0 h-full bg-sidebar/95 backdrop-blur-xl border-r border-sidebar-border shadow-xl shadow-violet-500/5 transition-all duration-300 z-50",
           isCollapsed ? "w-16" : "w-64",
           isMobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0",
           className
@@ -224,17 +227,13 @@ export function ModernSidebar({
       >
         <div className="flex h-full flex-col">
           {/* Header */}
-          <div className="border-b border-border p-4">
+          <div className="border-b border-sidebar-border p-4">
             <div className="flex items-center justify-between">
-              {!isCollapsed && (
-                <div className="flex items-center space-x-3">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                    <CreditCard className="h-4 w-4 text-white" />
-                  </div>
-                  <div>
-                    <h2 className="text-sm font-semibold text-foreground">Smart Expense</h2>
-                    <p className="text-xs text-muted-foreground">Tracker</p>
-                  </div>
+              {!isCollapsed ? (
+                <Logo href="/dashboard" size="sm" />
+              ) : (
+                <div className="mx-auto brand-icon h-8 w-8 rounded-lg flex items-center justify-center">
+                  <CreditCard className="h-4 w-4 text-white" />
                 </div>
               )}
               <Button
@@ -248,25 +247,25 @@ export function ModernSidebar({
             </div>
           </div>
 
-          {/* User Profile */}
-          <div className="border-b border-border p-4">
-            <div className={cn("flex items-center", isCollapsed ? "justify-center" : "space-x-3")}>
-              <Avatar className="h-10 w-10 ring-2 ring-blue-500/20">
-                <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-sm">
+          {/* User Profile — compact */}
+          <div className="border-b border-sidebar-border px-4 py-3">
+            <div className={cn("flex items-center gap-3", isCollapsed && "justify-center")}>
+              <Avatar className="h-9 w-9 ring-2 ring-violet-500/25 shrink-0">
+                <AvatarFallback className="brand-icon text-white font-semibold text-sm">
                   {user?.name?.[0] || 'U'}
                 </AvatarFallback>
               </Avatar>
               {!isCollapsed && (
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-foreground truncate">{user?.name || 'User'}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user?.email || 'user@email.com'}</p>
+                  <p className="text-sm font-medium text-sidebar-foreground truncate">{user?.name || 'User'}</p>
+                  <p className="text-[11px] text-muted-foreground truncate">{user?.email || 'user@email.com'}</p>
                 </div>
               )}
             </div>
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+          <nav className="flex-1 overflow-y-auto sidebar-scroll px-3 py-4 space-y-6">
             {navigationItems.map((section, sectionIndex) => (
               <div key={section.title}>
                 {!isCollapsed && (
@@ -283,10 +282,10 @@ export function ModernSidebar({
                           <Button
                             variant={isActive ? "secondary" : "ghost"}
                             className={cn(
-                              "w-full justify-start h-10 px-3",
+                              "w-full justify-start h-9 px-3 rounded-lg text-sm",
                               isActive 
-                                ? "bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900 border-r-2 border-blue-500" 
-                                : "text-muted-foreground hover:text-foreground hover:bg-accent",
+                                ? "nav-active hover:bg-violet-500/10 dark:hover:bg-violet-500/15 font-medium" 
+                                : "text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent/80",
                               isCollapsed && "justify-center px-0"
                             )}
                           >
@@ -297,7 +296,7 @@ export function ModernSidebar({
                                 {item.badge && (
                                   <Badge 
                                     variant="secondary" 
-                                    className="ml-2 h-5 px-1.5 text-xs bg-blue-100 text-blue-700"
+                                    className="ml-2 h-5 px-1.5 text-xs bg-violet-100 text-violet-700 dark:bg-violet-950 dark:text-violet-300"
                                   >
                                     {item.badge}
                                   </Badge>
@@ -356,7 +355,7 @@ export function ModernSidebar({
               variant="ghost"
               onClick={logout}
               className={cn(
-                "w-full justify-start h-10 px-3 text-red-600 hover:text-red-700 hover:bg-red-50",
+                "w-full justify-start h-10 px-3 text-red-600 hover:text-red-500 hover:bg-red-500/10 dark:text-red-400 dark:hover:text-red-300 dark:hover:bg-red-500/10",
                 isCollapsed && "justify-center px-0"
               )}
             >

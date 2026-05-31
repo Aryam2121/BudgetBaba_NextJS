@@ -17,6 +17,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Textarea } from '@/components/ui/textarea'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Progress } from '@/components/ui/progress'
+import { api } from '@/lib/api'
 import { toast } from 'sonner'
 import {
   Settings,
@@ -164,18 +165,14 @@ export default function SettingsPage() {
   const loadSettings = async () => {
     try {
       setLoading(true)
-      
-      // Simulate loading settings
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Initialize with user data
       setSettings(prev => ({
         ...prev,
         profile: {
           ...prev.profile,
           name: user?.name || '',
           email: user?.email || '',
-          avatar: user?.avatar || ''
+          avatar: '',
+          currency: user?.currency || prev.profile.currency,
         }
       }))
     } catch (error) {
@@ -189,16 +186,21 @@ export default function SettingsPage() {
   const handleSaveSettings = async () => {
     try {
       setSaving(true)
-      
-      // Save currency to localStorage for now
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('userCurrency', settings.profile.currency)
+
+      const response = await api.updateProfile({
+        name: settings.profile.name,
+        currency: settings.profile.currency,
+      })
+
+      if (response.error) {
+        throw new Error(response.error)
       }
-      
-      // Simulate saving other settings
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
-      toast.success('Settings saved successfully! Currency changes will be reflected after page refresh.')
+
+      if (settings.profile.currency) {
+        setCurrency(settings.profile.currency)
+      }
+
+      toast.success('Settings saved successfully')
     } catch (error) {
       console.error('Error saving settings:', error)
       toast.error('Failed to save settings')
@@ -224,9 +226,15 @@ export default function SettingsPage() {
     }
     
     try {
-      // Simulate password change
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+      const response = await api.changePassword({
+        currentPassword: passwordForm.current,
+        newPassword: passwordForm.new,
+      })
+
+      if (response.error) {
+        throw new Error(response.error)
+      }
+
       setSettings(prev => ({
         ...prev,
         security: {
@@ -257,26 +265,21 @@ export default function SettingsPage() {
 
   const handleExportData = async () => {
     try {
-      // Simulate data export
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
-      const exportData = {
-        profile: settings.profile,
-        exportedAt: new Date().toISOString(),
-        expenses: [], // Would contain actual expense data
-        categories: [],
-        groups: []
+      const response = await api.exportAllData('json')
+
+      if (response.error || !response.data?.blob) {
+        throw new Error(response.error || 'Export failed')
       }
-      
-      const dataStr = JSON.stringify(exportData, null, 2)
-      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
-      
-      const exportFileDefaultName = `expense-data-${new Date().toISOString().split('T')[0]}.json`
-      const linkElement = document.createElement('a')
-      linkElement.setAttribute('href', dataUri)
-      linkElement.setAttribute('download', exportFileDefaultName)
-      linkElement.click()
-      
+
+      const url = window.URL.createObjectURL(response.data.blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = response.data.filename || `budgetbaba-export-${new Date().toISOString().split('T')[0]}.json`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+      window.URL.revokeObjectURL(url)
+
       toast.success('Data exported successfully')
     } catch (error) {
       toast.error('Failed to export data')
@@ -343,8 +346,8 @@ export default function SettingsPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Settings</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+              <p className="text-muted-foreground mt-1">
                 Manage your account, preferences, and security settings
               </p>
             </div>
@@ -352,7 +355,7 @@ export default function SettingsPage() {
             <Button 
               onClick={handleSaveSettings}
               disabled={saving}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+              className="brand-btn"
             >
               {saving ? (
                 <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -365,7 +368,7 @@ export default function SettingsPage() {
 
           {/* Settings Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-white/60 backdrop-blur-sm">
+            <TabsList className="dashboard-panel">
               <TabsTrigger value="profile">
                 <User className="h-4 w-4 mr-2" />
                 Profile
@@ -399,7 +402,7 @@ export default function SettingsPage() {
             <TabsContent value="profile" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Profile Information */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Profile Information</CardTitle>
                     <CardDescription>
@@ -494,7 +497,7 @@ export default function SettingsPage() {
                 </Card>
 
                 {/* Localization */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Localization</CardTitle>
                     <CardDescription>
@@ -568,7 +571,7 @@ export default function SettingsPage() {
             <TabsContent value="preferences" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Appearance */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Appearance</CardTitle>
                     <CardDescription>
@@ -587,7 +590,7 @@ export default function SettingsPage() {
                           <button
                             key={value}
                             onClick={() => updatePreferences('theme', value)}
-                            className={`p-3 border rounded-lg text-center hover:bg-slate-50 transition-colors ${
+                            className={`p-3 border rounded-lg text-center hover:bg-muted/40 transition-colors ${
                               settings.preferences.theme === value ? 'border-blue-500 bg-blue-50' : 'border-slate-200'
                             }`}
                           >
@@ -653,7 +656,7 @@ export default function SettingsPage() {
                 </Card>
 
                 {/* Behavior */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Behavior</CardTitle>
                     <CardDescription>
@@ -664,14 +667,16 @@ export default function SettingsPage() {
                     <div className="space-y-2">
                       <Label htmlFor="default-category">Default Expense Category</Label>
                       <Select
-                        value={settings.preferences.defaultExpenseCategory}
-                        onValueChange={(value) => updatePreferences('defaultExpenseCategory', value)}
+                        value={settings.preferences.defaultExpenseCategory || 'none'}
+                        onValueChange={(value) =>
+                          updatePreferences('defaultExpenseCategory', value === 'none' ? '' : value)
+                        }
                       >
                         <SelectTrigger id="default-category">
                           <SelectValue placeholder="Select default category" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="">None</SelectItem>
+                          <SelectItem value="none">None</SelectItem>
                           <SelectItem value="food">Food & Dining</SelectItem>
                           <SelectItem value="transport">Transportation</SelectItem>
                           <SelectItem value="shopping">Shopping</SelectItem>
@@ -705,7 +710,7 @@ export default function SettingsPage() {
             <TabsContent value="currency" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Currency Settings */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <CreditCard className="h-5 w-5 text-green-600" />
@@ -753,7 +758,7 @@ export default function SettingsPage() {
                 </Card>
 
                 {/* Currency Format Preview */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle className="flex items-center gap-2">
                       <Globe className="h-5 w-5 text-blue-600" />
@@ -797,7 +802,7 @@ export default function SettingsPage() {
             <TabsContent value="security" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Password & Authentication */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Password & Authentication</CardTitle>
                     <CardDescription>
@@ -805,7 +810,7 @@ export default function SettingsPage() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="p-3 bg-slate-50 rounded-lg">
+                    <div className="p-3 bg-muted/40 rounded-lg">
                       <div className="flex items-center justify-between mb-2">
                         <span className="text-sm font-medium">Password Strength</span>
                         <Badge variant="secondary">Strong</Badge>
@@ -881,7 +886,7 @@ export default function SettingsPage() {
                 </Card>
 
                 {/* Security Settings */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Security Settings</CardTitle>
                     <CardDescription>
@@ -961,7 +966,7 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="privacy" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle>Privacy Settings</CardTitle>
                   <CardDescription>
@@ -1048,7 +1053,7 @@ export default function SettingsPage() {
             </TabsContent>
 
             <TabsContent value="notifications" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle>Notification Preferences</CardTitle>
                   <CardDescription>
@@ -1165,7 +1170,7 @@ export default function SettingsPage() {
             <TabsContent value="data" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Data Export */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Data Export</CardTitle>
                     <CardDescription>
@@ -1214,7 +1219,7 @@ export default function SettingsPage() {
                 </Card>
 
                 {/* Account Management */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle>Account Management</CardTitle>
                     <CardDescription>
@@ -1258,7 +1263,7 @@ export default function SettingsPage() {
                           <AlertTriangle className="h-4 w-4" />
                           <span className="font-medium">Danger Zone</span>
                         </div>
-                        <p className="text-sm text-slate-600">
+                        <p className="text-sm text-muted-foreground">
                           Permanently delete your account and all associated data. This action cannot be undone.
                         </p>
                         <Button 

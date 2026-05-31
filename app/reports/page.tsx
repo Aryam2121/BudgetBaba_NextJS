@@ -19,6 +19,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { ExpenseLineChart } from '@/components/charts/ExpenseLineChart'
 import { ExpensePieChart } from '@/components/charts/ExpensePieChart'
 import { api } from '@/lib/api'
+import { fetchAllExpenses } from '@/lib/api-utils'
 import { toast } from 'sonner'
 import {
   Download,
@@ -94,13 +95,12 @@ export default function ReportsPage() {
       setLoading(true)
       
       // Load expenses and monthly summary
-      const [expensesResponse, summaryResponse] = await Promise.all([
-        api.getExpenses(),
+      const [expenses, summaryResponse] = await Promise.all([
+        fetchAllExpenses(),
         api.getMonthlySummary()
       ])
 
       // Extract available categories and users
-      const expenses = expensesResponse.data || []
       const categories = [...new Set(expenses.map((e: any) => e.category).filter(Boolean))]
       const users = [...new Set(expenses.map((e: any) => e.userId || e.user || 'Unknown').filter(Boolean))]
       
@@ -126,8 +126,7 @@ export default function ReportsPage() {
       let summary = summaryData
       
       if (!expenseData) {
-        const expensesResponse = await api.getExpenses()
-        expenseData = expensesResponse.data || []
+        expenseData = await fetchAllExpenses()
       }
       
       if (!summary) {
@@ -347,8 +346,8 @@ ${reportData.expenses.map(expense =>
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Reports & Analytics</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Reports & Analytics</h1>
+              <p className="text-muted-foreground mt-1">
                 Generate detailed reports and export your expense data
               </p>
             </div>
@@ -361,7 +360,7 @@ ${reportData.expenses.map(expense =>
               <Button 
                 onClick={() => generateReport()}
                 disabled={generating}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                className="brand-btn"
               >
                 {generating ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -375,7 +374,7 @@ ${reportData.expenses.map(expense =>
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
             {/* Filters Sidebar */}
-            <Card className="lg:col-span-1 bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="lg:col-span-1 dashboard-panel">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Filter className="h-5 w-5 mr-2" />
@@ -573,7 +572,7 @@ ${reportData.expenses.map(expense =>
               {loading ? (
                 <div className="space-y-6">
                   {Array.from({ length: 3 }).map((_, i) => (
-                    <Card key={i} className="animate-pulse bg-white/60 backdrop-blur-sm border-white/20">
+                    <Card key={i} className="animate-pulse dashboard-panel">
                       <CardHeader>
                         <div className="h-6 bg-slate-200 rounded w-1/3" />
                         <div className="h-4 bg-slate-200 rounded w-1/2" />
@@ -586,7 +585,7 @@ ${reportData.expenses.map(expense =>
                 </div>
               ) : reportData ? (
                 <Tabs defaultValue="overview" className="space-y-6">
-                  <TabsList className="bg-white/60 backdrop-blur-sm">
+                  <TabsList className="dashboard-panel">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="charts">Charts</TabsTrigger>
                     <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
@@ -596,13 +595,13 @@ ${reportData.expenses.map(expense =>
                   <TabsContent value="overview" className="space-y-6">
                     {/* Summary Stats */}
                     <div className="grid gap-6 md:grid-cols-3">
-                      <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                      <Card className="dashboard-panel">
                         <CardContent className="p-6">
                           <div className="flex items-center">
                             <DollarSign className="h-8 w-8 text-green-500" />
                             <div className="ml-4">
-                              <p className="text-sm font-medium text-slate-600">Total Expenses</p>
-                              <p className="text-2xl font-bold text-slate-800">
+                              <p className="text-sm font-medium text-muted-foreground">Total Expenses</p>
+                              <p className="text-2xl font-bold text-foreground">
                                 ${reportData.totalExpenses.toFixed(2)}
                               </p>
                             </div>
@@ -610,13 +609,13 @@ ${reportData.expenses.map(expense =>
                         </CardContent>
                       </Card>
                       
-                      <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                      <Card className="dashboard-panel">
                         <CardContent className="p-6">
                           <div className="flex items-center">
                             <FileText className="h-8 w-8 text-blue-500" />
                             <div className="ml-4">
-                              <p className="text-sm font-medium text-slate-600">Transactions</p>
-                              <p className="text-2xl font-bold text-slate-800">
+                              <p className="text-sm font-medium text-muted-foreground">Transactions</p>
+                              <p className="text-2xl font-bold text-foreground">
                                 {reportData.totalTransactions}
                               </p>
                             </div>
@@ -624,13 +623,13 @@ ${reportData.expenses.map(expense =>
                         </CardContent>
                       </Card>
                       
-                      <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                      <Card className="dashboard-panel">
                         <CardContent className="p-6">
                           <div className="flex items-center">
                             <TrendingUp className="h-8 w-8 text-purple-500" />
                             <div className="ml-4">
-                              <p className="text-sm font-medium text-slate-600">Average</p>
-                              <p className="text-2xl font-bold text-slate-800">
+                              <p className="text-sm font-medium text-muted-foreground">Average</p>
+                              <p className="text-2xl font-bold text-foreground">
                                 ${reportData.averageTransaction.toFixed(2)}
                               </p>
                             </div>
@@ -640,7 +639,7 @@ ${reportData.expenses.map(expense =>
                     </div>
 
                     {/* Quick Insights */}
-                    <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                    <Card className="dashboard-panel">
                       <CardHeader>
                         <CardTitle>Report Summary</CardTitle>
                         <CardDescription>
@@ -659,17 +658,17 @@ ${reportData.expenses.map(expense =>
                           </Alert>
                           
                           <div className="grid grid-cols-2 gap-4">
-                            <div className="text-center p-4 bg-slate-50 rounded-lg">
-                              <div className="text-2xl font-bold text-slate-800">
+                            <div className="text-center p-4 bg-muted/40 rounded-lg">
+                              <div className="text-2xl font-bold text-foreground">
                                 {reportData.monthlyTrend.length}
                               </div>
-                              <div className="text-sm text-slate-600">Months of Data</div>
+                              <div className="text-sm text-muted-foreground">Months of Data</div>
                             </div>
-                            <div className="text-center p-4 bg-slate-50 rounded-lg">
-                              <div className="text-2xl font-bold text-slate-800">
+                            <div className="text-center p-4 bg-muted/40 rounded-lg">
+                              <div className="text-2xl font-bold text-foreground">
                                 {reportData.categoryBreakdown.length}
                               </div>
-                              <div className="text-sm text-slate-600">Categories</div>
+                              <div className="text-sm text-muted-foreground">Categories</div>
                             </div>
                           </div>
                         </div>
@@ -679,7 +678,7 @@ ${reportData.expenses.map(expense =>
 
                   <TabsContent value="charts" className="space-y-6">
                     <div className="grid gap-6 lg:grid-cols-2">
-                      <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                      <Card className="dashboard-panel">
                         <CardHeader>
                           <CardTitle>Monthly Trend</CardTitle>
                         </CardHeader>
@@ -693,7 +692,7 @@ ${reportData.expenses.map(expense =>
                         </CardContent>
                       </Card>
                       
-                      <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                      <Card className="dashboard-panel">
                         <CardHeader>
                           <CardTitle>Category Distribution</CardTitle>
                         </CardHeader>
@@ -712,26 +711,26 @@ ${reportData.expenses.map(expense =>
                   <TabsContent value="breakdown" className="space-y-6">
                     <div className="grid gap-6 lg:grid-cols-2">
                       {/* Category Breakdown */}
-                      <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                      <Card className="dashboard-panel">
                         <CardHeader>
                           <CardTitle>Category Breakdown</CardTitle>
                         </CardHeader>
                         <CardContent>
                           <div className="space-y-3">
                             {reportData.categoryBreakdown.slice(0, 10).map((category, index) => (
-                              <div key={category.category} className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                              <div key={category.category} className="flex items-center justify-between p-2 bg-muted/40 rounded">
                                 <div className="flex items-center space-x-3">
                                   <div className="text-sm font-medium">#{index + 1}</div>
                                   <div>
                                     <div className="font-semibold">{category.category}</div>
-                                    <div className="text-xs text-slate-600">
+                                    <div className="text-xs text-muted-foreground">
                                       {category.count} transaction{category.count !== 1 ? 's' : ''}
                                     </div>
                                   </div>
                                 </div>
                                 <div className="text-right">
                                   <div className="font-bold">${category.total.toFixed(2)}</div>
-                                  <div className="text-xs text-slate-600">
+                                  <div className="text-xs text-muted-foreground">
                                     {((category.total / reportData.totalExpenses) * 100).toFixed(1)}%
                                   </div>
                                 </div>
@@ -743,26 +742,26 @@ ${reportData.expenses.map(expense =>
 
                       {/* User Breakdown */}
                       {reportData.userBreakdown.length > 1 && (
-                        <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                        <Card className="dashboard-panel">
                           <CardHeader>
                             <CardTitle>User Breakdown</CardTitle>
                           </CardHeader>
                           <CardContent>
                             <div className="space-y-3">
                               {reportData.userBreakdown.map((user, index) => (
-                                <div key={user.user} className="flex items-center justify-between p-2 bg-slate-50 rounded">
+                                <div key={user.user} className="flex items-center justify-between p-2 bg-muted/40 rounded">
                                   <div className="flex items-center space-x-3">
                                     <div className="text-sm font-medium">#{index + 1}</div>
                                     <div>
                                       <div className="font-semibold">{user.user}</div>
-                                      <div className="text-xs text-slate-600">
+                                      <div className="text-xs text-muted-foreground">
                                         {user.count} transaction{user.count !== 1 ? 's' : ''}
                                       </div>
                                     </div>
                                   </div>
                                   <div className="text-right">
                                     <div className="font-bold">${user.total.toFixed(2)}</div>
-                                    <div className="text-xs text-slate-600">
+                                    <div className="text-xs text-muted-foreground">
                                       {((user.total / reportData.totalExpenses) * 100).toFixed(1)}%
                                     </div>
                                   </div>
@@ -776,7 +775,7 @@ ${reportData.expenses.map(expense =>
                   </TabsContent>
 
                   <TabsContent value="transactions" className="space-y-6">
-                    <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                    <Card className="dashboard-panel">
                       <CardHeader>
                         <CardTitle>Detailed Transactions</CardTitle>
                         <CardDescription>
@@ -796,7 +795,7 @@ ${reportData.expenses.map(expense =>
                             </thead>
                             <tbody>
                               {reportData.expenses.slice(0, 50).map((expense, index) => (
-                                <tr key={index} className="border-b hover:bg-slate-50">
+                                <tr key={index} className="border-b hover:bg-muted/40">
                                   <td className="p-2 text-sm">
                                     {new Date(expense.date || expense.createdAt).toLocaleDateString()}
                                   </td>
@@ -814,7 +813,7 @@ ${reportData.expenses.map(expense =>
                             </tbody>
                           </table>
                           {reportData.expenses.length > 50 && (
-                            <div className="text-center p-4 text-sm text-slate-600">
+                            <div className="text-center p-4 text-sm text-muted-foreground">
                               Showing first 50 transactions. Export report to see all {reportData.expenses.length} transactions.
                             </div>
                           )}
@@ -824,10 +823,10 @@ ${reportData.expenses.map(expense =>
                   </TabsContent>
                 </Tabs>
               ) : (
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardContent className="p-12 text-center">
                     <BarChart3 className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                    <h3 className="text-lg font-medium text-slate-600 mb-2">No Report Generated</h3>
+                    <h3 className="text-lg font-medium text-muted-foreground mb-2">No Report Generated</h3>
                     <p className="text-slate-500 mb-4">Click "Generate Report" to create your custom expense report</p>
                     <Button onClick={() => generateReport()}>
                       <Search className="h-4 w-4 mr-2" />

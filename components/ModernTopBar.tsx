@@ -21,6 +21,7 @@ import {
   Settings,
   Moon,
   Sun,
+  Menu,
   Globe,
   CreditCard
 } from 'lucide-react'
@@ -87,12 +88,20 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
 
   return (
     <header className={cn(
-      "sticky top-0 z-40 w-full bg-background/95 backdrop-blur-xl border-b border-border",
+      "sticky top-0 z-40 w-full bg-background/80 backdrop-blur-xl border-b border-border/60",
       className
     )}>
       <div className="flex h-16 items-center justify-between px-6">
         {/* Left Section - Breadcrumbs */}
         <div className="flex items-center space-x-4 flex-1">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="md:hidden p-2"
+            onClick={onMobileMenuToggle}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
           {/* Breadcrumbs */}
           <nav className="flex items-center space-x-1 text-sm">
             <Link 
@@ -128,7 +137,7 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
               placeholder="Search expenses, categories, splits..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 text-sm bg-muted border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+              className="w-full pl-10 pr-4 py-2 text-sm bg-muted/50 border border-border/60 rounded-lg focus:outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-500/40 transition-all placeholder:text-muted-foreground"
             />
           </div>
         </div>
@@ -138,7 +147,7 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
           {/* Quick Actions */}
           <div className="hidden md:flex items-center space-x-2">
             <Link href="/expenses/new">
-              <Button size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+              <Button size="sm" className="brand-btn">
                 <Plus className="h-4 w-4 mr-1" />
                 Add Expense
               </Button>
@@ -196,13 +205,9 @@ export function ModernTopBar({ className, isSidebarCollapsed, onMobileMenuToggle
           </Link>
 
           {/* User Profile */}
-          <div className="flex items-center space-x-3 pl-3 border-l border-border">
-            <div className="hidden md:block text-right">
-              <p className="text-sm font-medium text-foreground">{user?.name || 'User'}</p>
-              <p className="text-xs text-muted-foreground">{user?.email || 'user@email.com'}</p>
-            </div>
-            <Avatar className="h-8 w-8 ring-2 ring-blue-500/20">
-              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold text-xs">
+          <div className="flex items-center space-x-2 pl-2 border-l border-border/60">
+            <Avatar className="h-8 w-8 ring-2 ring-violet-500/20 shrink-0">
+              <AvatarFallback className="brand-icon text-white font-semibold text-xs">
                 {user?.name?.[0] || 'U'}
               </AvatarFallback>
             </Avatar>

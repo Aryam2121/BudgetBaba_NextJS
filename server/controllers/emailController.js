@@ -208,23 +208,29 @@ class EmailController {
   getEmailStatus = async (req, res) => {
     try {
       const user = await User.findById(req.user._id);
-      
+      if (!user) {
+        return res.status(404).json({ error: 'User not found' });
+      }
+
+      const gmail = user.emailConnections?.gmail || {};
+      const outlook = user.emailConnections?.outlook || {};
+
       const emailStatus = {
         gmail: {
-          connected: user.emailConnections.gmail.connected,
-          email: user.emailConnections.gmail.email,
-          connectedAt: user.emailConnections.gmail.connectedAt,
-          tokenExpired: user.emailConnections.gmail.tokenExpiry ? 
-            new Date() > user.emailConnections.gmail.tokenExpiry : false
+          connected: gmail.connected || false,
+          email: gmail.email || null,
+          connectedAt: gmail.connectedAt || null,
+          tokenExpired: gmail.tokenExpiry ?
+            new Date() > gmail.tokenExpiry : false
         },
         outlook: {
-          connected: user.emailConnections.outlook.connected,
-          email: user.emailConnections.outlook.email,
-          connectedAt: user.emailConnections.outlook.connectedAt,
-          tokenExpired: user.emailConnections.outlook.tokenExpiry ? 
-            new Date() > user.emailConnections.outlook.tokenExpiry : false
+          connected: outlook.connected || false,
+          email: outlook.email || null,
+          connectedAt: outlook.connectedAt || null,
+          tokenExpired: outlook.tokenExpiry ?
+            new Date() > outlook.tokenExpiry : false
         },
-        preferences: user.emailPreferences
+        preferences: user.emailPreferences || {}
       };
 
       res.json(emailStatus);

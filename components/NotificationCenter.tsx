@@ -4,6 +4,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Bell, Check, Trash2, Settings, Filter } from 'lucide-react'
 import { api } from '@/lib/api'
+import { getListFromResponse } from '@/lib/api-utils'
 import { useToast } from '@/hooks/use-toast'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
@@ -41,7 +42,7 @@ const NotificationCenter = () => {
 
       const response = await api.getNotifications(filters)
       if (response.data) {
-        setNotifications(response.data.data || [])
+        setNotifications(getListFromResponse(response.data, ['notifications']))
       }
     } catch (error) {
       toast({

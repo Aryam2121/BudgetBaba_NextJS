@@ -334,7 +334,7 @@ export default function CategoryManagement() {
                 {expenseCategories.map((category) => (
                   <div
                     key={category._id}
-                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-muted/40 transition-colors"
                   >
                     <GripVertical className="h-5 w-5 text-gray-400 cursor-move" />
                     <div
@@ -391,7 +391,7 @@ export default function CategoryManagement() {
                 {incomeCategories.map((category) => (
                   <div
                     key={category._id}
-                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-4 p-3 rounded-lg border hover:bg-muted/40 transition-colors"
                   >
                     <GripVertical className="h-5 w-5 text-gray-400 cursor-move" />
                     <div

@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
@@ -15,15 +15,43 @@ interface EmailPreferencesProps {
 
 export function EmailPreferences({ className }: EmailPreferencesProps) {
   const [preferences, setPreferences] = useState({
-    expenseNotifications: true,
-    budgetAlerts: true,
-    weeklySummary: true,
-    monthlyReport: false,
+    sendFromPersonalEmail: true,
+    preferredProvider: "gmail" as "gmail" | "outlook" | "app",
+    splitNotifications: true,
+    settlementNotifications: true,
+    reminderNotifications: true,
+    fallbackToReplyTo: true,
   })
   const [loading, setLoading] = useState(false)
+  const [initialLoading, setInitialLoading] = useState(true)
   const { toast } = useToast()
 
-  const handlePreferenceChange = (key: string, value: boolean) => {
+  useEffect(() => {
+    const loadPreferences = async () => {
+      try {
+        const response = await api.getEmailStatus()
+        if (response.data?.preferences) {
+          const prefs = response.data.preferences
+          setPreferences({
+            sendFromPersonalEmail: prefs.sendFromPersonalEmail ?? true,
+            preferredProvider: prefs.preferredProvider || "gmail",
+            splitNotifications: prefs.splitNotifications ?? true,
+            settlementNotifications: prefs.settlementNotifications ?? true,
+            reminderNotifications: prefs.reminderNotifications ?? true,
+            fallbackToReplyTo: prefs.fallbackToReplyTo ?? true,
+          })
+        }
+      } catch (error) {
+        console.error("Failed to load email preferences:", error)
+      } finally {
+        setInitialLoading(false)
+      }
+    }
+
+    loadPreferences()
+  }, [])
+
+  const handlePreferenceChange = (key: keyof typeof preferences, value: boolean | string) => {
     setPreferences((prev) => ({
       ...prev,
       [key]: value,
@@ -59,6 +87,16 @@ export function EmailPreferences({ className }: EmailPreferencesProps) {
     }
   }
 
+  if (initialLoading) {
+    return (
+      <Card className={className}>
+        <CardContent className="py-8 text-center text-sm text-muted-foreground">
+          Loading email preferences...
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className={className}>
       <CardHeader>
@@ -66,63 +104,63 @@ export function EmailPreferences({ className }: EmailPreferencesProps) {
           <Mail className="h-5 w-5" />
           <span>Email Preferences</span>
         </CardTitle>
-        <CardDescription>Choose which email notifications you'd like to receive</CardDescription>
+        <CardDescription>Choose which email notifications you&apos;d like to receive</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="expense-notifications" className="text-base">
-                Expense Notifications
+              <Label htmlFor="split-notifications" className="text-base">
+                Split Notifications
               </Label>
-              <p className="text-sm text-gray-600">Get notified when you add a new expense</p>
+              <p className="text-sm text-gray-600">Get notified about shared expense activity</p>
             </div>
             <Switch
-              id="expense-notifications"
-              checked={preferences.expenseNotifications}
-              onCheckedChange={(checked) => handlePreferenceChange("expenseNotifications", checked)}
+              id="split-notifications"
+              checked={preferences.splitNotifications}
+              onCheckedChange={(checked) => handlePreferenceChange("splitNotifications", checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="budget-alerts" className="text-base">
-                Budget Alerts
+              <Label htmlFor="settlement-notifications" className="text-base">
+                Settlement Notifications
               </Label>
-              <p className="text-sm text-gray-600">Receive alerts when approaching or exceeding budget limits</p>
+              <p className="text-sm text-gray-600">Receive alerts when splits are settled</p>
             </div>
             <Switch
-              id="budget-alerts"
-              checked={preferences.budgetAlerts}
-              onCheckedChange={(checked) => handlePreferenceChange("budgetAlerts", checked)}
+              id="settlement-notifications"
+              checked={preferences.settlementNotifications}
+              onCheckedChange={(checked) => handlePreferenceChange("settlementNotifications", checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="weekly-summary" className="text-base">
-                Weekly Summary
+              <Label htmlFor="reminder-notifications" className="text-base">
+                Reminder Notifications
               </Label>
-              <p className="text-sm text-gray-600">Get a weekly breakdown of your spending patterns</p>
+              <p className="text-sm text-gray-600">Payment reminders for outstanding splits</p>
             </div>
             <Switch
-              id="weekly-summary"
-              checked={preferences.weeklySummary}
-              onCheckedChange={(checked) => handlePreferenceChange("weeklySummary", checked)}
+              id="reminder-notifications"
+              checked={preferences.reminderNotifications}
+              onCheckedChange={(checked) => handlePreferenceChange("reminderNotifications", checked)}
             />
           </div>
 
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <Label htmlFor="monthly-report" className="text-base">
-                Monthly Report
+              <Label htmlFor="personal-email" className="text-base">
+                Send From Personal Email
               </Label>
-              <p className="text-sm text-gray-600">Detailed monthly spending analysis and insights</p>
+              <p className="text-sm text-gray-600">Use your connected Gmail/Outlook when available</p>
             </div>
             <Switch
-              id="monthly-report"
-              checked={preferences.monthlyReport}
-              onCheckedChange={(checked) => handlePreferenceChange("monthlyReport", checked)}
+              id="personal-email"
+              checked={preferences.sendFromPersonalEmail}
+              onCheckedChange={(checked) => handlePreferenceChange("sendFromPersonalEmail", checked)}
             />
           </div>
         </div>

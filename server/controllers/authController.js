@@ -10,7 +10,7 @@ const generateToken = (userId) => {
 const oauth2Client = new google.auth.OAuth2(
   process.env.GOOGLE_CLIENT_ID,
   process.env.GOOGLE_CLIENT_SECRET,
-  `${process.env.FRONTEND_URL}/auth/google/callback`
+  `${process.env.FRONTEND_URL || 'http://localhost:3000'}/auth/google/callback`
 )
 
 const register = async (req, res) => {
@@ -133,8 +133,8 @@ const googleCallback = async (req, res) => {
       return res.status(400).json({ error: 'Authorization code required' })
     }
 
-    // Get tokens from Google
-    const { tokens } = await oauth2Client.getAccessToken(code)
+    // Exchange authorization code for tokens
+    const { tokens } = await oauth2Client.getToken(code)
     oauth2Client.setCredentials(tokens)
 
     // Get user info from Google
@@ -153,7 +153,9 @@ const googleCallback = async (req, res) => {
       user = new User({
         name: userInfo.name,
         email: userInfo.email,
-        passwordHash: Math.random().toString(36), // Random password for OAuth users
+        googleId: userInfo.id,
+        avatar: userInfo.picture,
+        passwordHash: Math.random().toString(36).slice(-12),
         currency: 'INR', // Default to Indian Rupees
         emailConnections: {
           gmail: {
@@ -162,7 +164,7 @@ const googleCallback = async (req, res) => {
             accessToken: tokens.access_token,
             refreshToken: tokens.refresh_token,
             tokenExpiry: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
-            scope: 'https://www.googleapis.com/auth/gmail.send',
+            scope: tokens.scope || 'email profile',
             connectedAt: new Date()
           }
         },
@@ -175,6 +177,12 @@ const googleCallback = async (req, res) => {
         }
       })
     } else {
+      if (!user.emailConnections) user.emailConnections = {}
+      if (!user.emailPreferences) user.emailPreferences = {}
+
+      user.googleId = user.googleId || userInfo.id
+      if (userInfo.picture) user.avatar = userInfo.picture
+
       // Update existing user with Gmail connection
       user.emailConnections.gmail = {
         connected: true,
@@ -182,7 +190,7 @@ const googleCallback = async (req, res) => {
         accessToken: tokens.access_token,
         refreshToken: tokens.refresh_token,
         tokenExpiry: tokens.expiry_date ? new Date(tokens.expiry_date) : null,
-        scope: 'https://www.googleapis.com/auth/gmail.send',
+        scope: tokens.scope || 'email profile',
         connectedAt: new Date()
       }
       user.emailPreferences.sendFromPersonalEmail = true
@@ -213,7 +221,10 @@ const googleCallback = async (req, res) => {
     })
   } catch (error) {
     console.error('Google callback error:', error)
-    res.status(500).json({ error: 'Failed to process Google authentication' })
+    res.status(500).json({
+      error: 'Failed to process Google authentication',
+      message: process.env.NODE_ENV === 'development' ? error.message : undefined,
+    })
   }
 }
 

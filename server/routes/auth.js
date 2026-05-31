@@ -20,6 +20,67 @@ router.post("/login", authLimiter, login)
 router.get("/google", googleAuth)
 router.post("/google/callback", googleCallback)
 
+router.get("/profile", authMiddleware, async (req, res) => {
+  try {
+    res.json({ user: req.user })
+  } catch (error) {
+    console.error("Get profile error:", error)
+    res.status(500).json({ error: "Failed to get profile" })
+  }
+})
+
+router.put("/profile", authMiddleware, async (req, res) => {
+  try {
+    const { name, currency } = req.body
+    const updates = {}
+
+    if (name && typeof name === "string") {
+      updates.name = name.trim()
+    }
+
+    if (currency) {
+      const supportedCurrencies = ['USD', 'EUR', 'GBP', 'JPY', 'CAD', 'AUD', 'INR', 'CNY', 'CHF', 'SEK', 'NOK', 'DKK', 'PLN', 'CZK', 'HUF', 'RUB', 'KRW', 'SGD', 'HKD', 'MXN', 'BRL', 'ZAR', 'THB', 'TRY', 'ILS', 'AED', 'SAR']
+      if (!supportedCurrencies.includes(currency)) {
+        return res.status(400).json({ error: "Valid currency code is required" })
+      }
+      updates.currency = currency
+    }
+
+    const user = await User.findByIdAndUpdate(req.user._id, updates, { new: true }).select("-passwordHash")
+    res.json({ message: "Profile updated successfully", user })
+  } catch (error) {
+    console.error("Update profile error:", error)
+    res.status(500).json({ error: "Failed to update profile" })
+  }
+})
+
+router.post("/change-password", authMiddleware, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body
+
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ error: "Current and new password are required" })
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({ error: "New password must be at least 6 characters" })
+    }
+
+    const user = await User.findById(req.user._id)
+    if (!user.googleId && !(await user.comparePassword(currentPassword))) {
+      return res.status(401).json({ error: "Current password is incorrect" })
+    }
+
+    user.passwordHash = newPassword
+    await user.save()
+
+    res.json({ message: "Password changed successfully" })
+  } catch (error) {
+    console.error("Change password error:", error)
+    res.status(500).json({ error: "Failed to change password" })
+  }
+})
+
 router.put("/budget", authMiddleware, async (req, res) => {
   try {
     const { monthlyBudget } = req.body

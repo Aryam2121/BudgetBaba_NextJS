@@ -10,6 +10,7 @@
     "test:watch": "jest --watch --testEnvironment=node",
     "lint": "echo 'Linting...' && node -c server.js",
     "seed": "node scripts/seed-database.js",
+    "seed:bulk": "node scripts/seed-bulk-data.js",
     "weekly-summary": "node scripts/send-weekly-summary.js"
   },
   "dependencies": {

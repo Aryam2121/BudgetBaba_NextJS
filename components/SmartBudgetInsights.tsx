@@ -264,7 +264,7 @@ export function SmartBudgetInsights() {
             </div>
 
             {budgetHealth.recommendations.length > 0 && (
-              <div className="mt-4 p-3 bg-blue-100 rounded-lg">
+              <div className="mt-4 p-3 bg-blue-500/10 rounded-lg">
                 <h4 className="font-medium text-blue-900 mb-2">Top Recommendations</h4>
                 <ul className="text-sm text-blue-800 space-y-1">
                   {budgetHealth.recommendations.slice(0, 3).map((rec, index) => (

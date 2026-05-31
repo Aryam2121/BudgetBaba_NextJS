@@ -208,10 +208,40 @@ export default function SystemStatusPage() {
   })
 
   useEffect(() => {
-    // Simulate system health check
-    setTimeout(() => {
-      setLoading(false)
-    }, 1000)
+    const checkSystemHealth = async () => {
+      try {
+        const start = Date.now()
+        const health = await api.getHealth()
+        const responseTime = Date.now() - start
+        const isHealthy = health.data?.status === 'OK'
+
+        setSystemHealth(prev => ({
+          ...prev,
+          backend: isHealthy ? 100 : 40,
+          api: isHealthy ? Math.max(90, 100 - Math.floor(responseTime / 50)) : 40,
+          database: isHealthy ? 97 : 40,
+          overall: isHealthy ? 96 : 55,
+        }))
+
+        setStats(prev => ({
+          ...prev,
+          workingEndpoints: isHealthy ? prev.totalEndpoints : 0,
+          lastDeployment: health.data?.timestamp || new Date().toISOString(),
+        }))
+      } catch (error) {
+        setSystemHealth(prev => ({
+          ...prev,
+          backend: 0,
+          api: 0,
+          database: 0,
+          overall: 40,
+        }))
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    checkSystemHealth()
   }, [])
 
   const getStatusColor = (status: string) => {
@@ -255,7 +285,7 @@ export default function SystemStatusPage() {
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
               <div className="animate-spin h-12 w-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
-              <p className="text-slate-600">Checking system status...</p>
+              <p className="text-muted-foreground">Checking system status...</p>
             </div>
           </div>
         </DashboardLayout>
@@ -270,13 +300,13 @@ export default function SystemStatusPage() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800 mb-2">System Status</h1>
-              <p className="text-slate-600">
+              <h1 className="text-3xl font-bold text-foreground mb-2">System Status</h1>
+              <p className="text-muted-foreground">
                 Comprehensive system health and module status overview
               </p>
             </div>
             <div className="flex items-center space-x-2">
-              <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200">
+              <Badge variant="outline" className="soft-badge-green">
                 <Activity className="h-3 w-3 mr-1" />
                 System Healthy
               </Badge>
@@ -290,7 +320,7 @@ export default function SystemStatusPage() {
 
         {/* System Health Overview */}
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-5 mb-8">
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
                 <Globe className="h-5 w-5 mr-2 text-blue-500" />
@@ -305,7 +335,7 @@ export default function SystemStatusPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
                 <Code className="h-5 w-5 mr-2 text-purple-500" />
@@ -320,7 +350,7 @@ export default function SystemStatusPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
                 <Server className="h-5 w-5 mr-2 text-green-500" />
@@ -335,7 +365,7 @@ export default function SystemStatusPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
                 <Database className="h-5 w-5 mr-2 text-orange-500" />
@@ -350,7 +380,7 @@ export default function SystemStatusPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader className="pb-3">
               <CardTitle className="text-lg flex items-center">
                 <Wifi className="h-5 w-5 mr-2 text-cyan-500" />
@@ -368,7 +398,7 @@ export default function SystemStatusPage() {
 
         {/* Quick Stats */}
         <div className="grid gap-6 md:grid-cols-4 mb-8">
-          <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+          <Card className="feature-tile feature-tile-blue border-0 shadow-none">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-blue-700 mb-2">
                 {stats.activeModules}/{stats.totalModules}
@@ -377,7 +407,7 @@ export default function SystemStatusPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+          <Card className="feature-tile feature-tile-green border-0 shadow-none">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-green-700 mb-2">
                 {stats.workingEndpoints}/{stats.totalEndpoints}
@@ -386,7 +416,7 @@ export default function SystemStatusPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+          <Card className="feature-tile feature-tile-purple border-0 shadow-none">
             <CardContent className="p-6 text-center">
               <div className="text-3xl font-bold text-purple-700 mb-2">
                 {stats.uptime}
@@ -407,14 +437,14 @@ export default function SystemStatusPage() {
 
         {/* Detailed Status */}
         <Tabs defaultValue="modules" className="space-y-6">
-          <TabsList className="bg-white/60 backdrop-blur-sm">
+          <TabsList className="dashboard-panel">
             <TabsTrigger value="modules">System Modules</TabsTrigger>
             <TabsTrigger value="apis">API Endpoints</TabsTrigger>
             <TabsTrigger value="integrations">Integrations</TabsTrigger>
           </TabsList>
 
           <TabsContent value="modules" className="space-y-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+            <Card className="dashboard-panel shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Layers className="h-5 w-5 mr-2" />
@@ -427,7 +457,7 @@ export default function SystemStatusPage() {
               <CardContent>
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                   {systemModules.map((module) => (
-                    <Card key={module.name} className="border border-slate-200 hover:shadow-lg transition-shadow">
+                    <Card key={module.name} className="border border-border/60 hover:shadow-lg transition-shadow">
                       <CardHeader className="pb-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-2">
@@ -443,7 +473,7 @@ export default function SystemStatusPage() {
                         </div>
                       </CardHeader>
                       <CardContent className="space-y-3">
-                        <p className="text-sm text-slate-600">{module.description}</p>
+                        <p className="text-sm text-muted-foreground">{module.description}</p>
                         
                         <div className="flex items-center justify-between text-xs">
                           <span className="text-slate-500">Version {module.version}</span>
@@ -451,7 +481,7 @@ export default function SystemStatusPage() {
                         </div>
                         
                         <div className="space-y-1">
-                          <p className="text-xs font-medium text-slate-700">Features:</p>
+                          <p className="text-xs font-medium text-foreground/90">Features:</p>
                           <div className="flex flex-wrap gap-1">
                             {module.features.slice(0, 3).map((feature) => (
                               <Badge key={feature} variant="secondary" className="text-xs">
@@ -482,7 +512,7 @@ export default function SystemStatusPage() {
           </TabsContent>
 
           <TabsContent value="apis" className="space-y-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+            <Card className="dashboard-panel shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Globe className="h-5 w-5 mr-2" />
@@ -495,15 +525,15 @@ export default function SystemStatusPage() {
               <CardContent>
                 <div className="space-y-3">
                   {apiEndpoints.map((endpoint, index) => (
-                    <div key={index} className="flex items-center justify-between p-3 bg-white/40 rounded-lg border border-slate-200">
+                    <div key={index} className="flex items-center justify-between p-3 surface-subtle border border-border/60">
                       <div className="flex items-center space-x-3">
                         <Badge variant="outline" className="font-mono text-xs">
                           {endpoint.method}
                         </Badge>
-                        <code className="text-sm text-slate-700 font-mono">
+                        <code className="text-sm text-foreground/90 font-mono">
                           {endpoint.path}
                         </code>
-                        <span className="text-sm text-slate-600">{endpoint.name}</span>
+                        <span className="text-sm text-muted-foreground">{endpoint.name}</span>
                       </div>
                       <div className="flex items-center space-x-2">
                         {endpoint.responseTime && (
@@ -526,7 +556,7 @@ export default function SystemStatusPage() {
           </TabsContent>
 
           <TabsContent value="integrations" className="space-y-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+            <Card className="dashboard-panel shadow-xl">
               <CardHeader>
                 <CardTitle className="flex items-center">
                   <Zap className="h-5 w-5 mr-2" />
@@ -570,14 +600,14 @@ export default function SystemStatusPage() {
                       lastChecked: '3 minutes ago'
                     }
                   ].map((integration) => (
-                    <div key={integration.name} className="flex items-center justify-between p-4 bg-white/40 rounded-lg border border-slate-200">
+                    <div key={integration.name} className="flex items-center justify-between p-4 surface-subtle border border-border/60">
                       <div className="flex items-center space-x-4">
                         <div className="h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
                           <Zap className="h-6 w-6 text-blue-600" />
                         </div>
                         <div>
-                          <h4 className="font-medium text-slate-800">{integration.name}</h4>
-                          <p className="text-sm text-slate-600">{integration.description}</p>
+                          <h4 className="font-medium text-foreground">{integration.name}</h4>
+                          <p className="text-sm text-muted-foreground">{integration.description}</p>
                           <p className="text-xs text-slate-500">Last checked: {integration.lastChecked}</p>
                         </div>
                       </div>

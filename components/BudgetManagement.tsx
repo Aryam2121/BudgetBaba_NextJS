@@ -28,6 +28,7 @@ import {
   Target
 } from 'lucide-react'
 import { api } from '@/lib/api'
+import { getListFromResponse } from '@/lib/api-utils'
 import { useToast } from '@/hooks/use-toast'
 
 interface Budget {
@@ -75,7 +76,7 @@ const BudgetManagement = () => {
     try {
       const response = await api.getBudgets()
       if (response.data) {
-        setBudgets(response.data.data || [])
+        setBudgets(getListFromResponse(response.data, ['budgets']))
       }
     } catch (error) {
       toast({

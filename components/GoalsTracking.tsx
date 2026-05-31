@@ -18,6 +18,7 @@ import {
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Target, Plus, Edit2, Trash2, TrendingUp, Calendar, DollarSign } from 'lucide-react'
 import { api } from '@/lib/api'
+import { getListFromResponse } from '@/lib/api-utils'
 import { useToast } from '@/hooks/use-toast'
 
 interface Goal {
@@ -50,7 +51,7 @@ const GoalsTracking = () => {
     targetAmount: '',
     targetDate: '',
     category: 'savings',
-    priority: 'medium' as const,
+    priority: 'medium' as 'low' | 'medium' | 'high',
     isRecurring: false,
     recurringFrequency: 'monthly' as const
   })
@@ -64,7 +65,28 @@ const GoalsTracking = () => {
     try {
       const response = await api.getGoals()
       if (response.data) {
-        setGoals(response.data.data || [])
+        const rawGoals = getListFromResponse<any>(response.data, ['goals'])
+        setGoals(rawGoals.map((goal) => {
+          const daysRemaining = Math.max(
+            0,
+            Math.ceil((new Date(goal.targetDate).getTime() - Date.now()) / (1000 * 60 * 60 * 24))
+          )
+          const monthsRemaining = Math.max(daysRemaining / 30, 1)
+          return {
+            ...goal,
+            name: goal.title || goal.name,
+            category: goal.type || goal.category || 'savings',
+            progressPercentage: goal.targetAmount
+              ? Math.min(100, (goal.currentAmount / goal.targetAmount) * 100)
+              : 0,
+            daysRemaining,
+            averageMonthlyRequired: Math.max(
+              0,
+              (goal.targetAmount - goal.currentAmount) / monthsRemaining
+            ),
+            isRecurring: goal.isRecurring ?? false,
+          }
+        }))
       }
     } catch (error) {
       toast({
@@ -91,8 +113,12 @@ const GoalsTracking = () => {
 
     try {
       const goalData = {
-        ...formData,
-        targetAmount: parseFloat(formData.targetAmount)
+        title: formData.name,
+        description: formData.description,
+        type: formData.category,
+        targetAmount: parseFloat(formData.targetAmount),
+        targetDate: formData.targetDate,
+        priority: formData.priority,
       }
 
       if (editingGoal) {
@@ -152,7 +178,7 @@ const GoalsTracking = () => {
 
   const updateGoalProgress = async (goalId: string, amount: number) => {
     try {
-      await api.updateGoalProgress(goalId, { amount })
+      await api.addGoalProgress(goalId, { amount })
       fetchGoals()
       toast({
         title: 'Success',

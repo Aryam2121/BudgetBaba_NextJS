@@ -40,6 +40,7 @@ import { RecentExpenses } from "@/components/RecentExpenses"
 import { SplitExpenseDialog } from "@/components/SplitExpenseDialog"
 import { ProtectedRoute } from "@/components/ProtectedRoute"
 import { api } from "@/lib/api"
+import { getExpensesList } from "@/lib/api-utils"
 import Link from "next/link"
 
 interface DashboardStats {
@@ -199,8 +200,7 @@ export default function Dashboard() {
 
       // Process recent expenses
       if (expensesResponse.status === 'fulfilled' && expensesResponse.value.data) {
-        const expensesData = expensesResponse.value.data as any
-        const expenses = Array.isArray(expensesData) ? expensesData : expensesData.expenses || []
+        const expenses = getExpensesList(expensesResponse.value.data)
         
         setRecentExpenses(expenses.slice(0, 5).map((expense: any) => ({
           id: expense._id || expense.id,
@@ -337,7 +337,7 @@ export default function Dashboard() {
               </Button>
               
               <Link href="/expenses/new">
-                <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 whitespace-nowrap">
+                <Button className="brand-btn whitespace-nowrap">
                   <Plus className="h-4 w-4 mr-2" />
                   <span className="hidden sm:inline">Add Expense</span>
                   <span className="sm:hidden">Add</span>
@@ -623,7 +623,7 @@ export default function Dashboard() {
                     </Button>
                   </Link>
                   <Link href="/expenses/new">
-                    <Button size="sm" className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                    <Button size="sm" className="brand-btn">
                       <Plus className="h-4 w-4 mr-2" />
                       Add
                     </Button>
@@ -639,7 +639,7 @@ export default function Dashboard() {
                     <h3 className="text-lg font-medium text-muted-foreground mb-2">No expenses yet</h3>
                     <p className="text-muted-foreground mb-4">Start tracking your expenses to see them here</p>
                     <Link href="/expenses/new">
-                      <Button className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                      <Button className="brand-btn">
                         <Plus className="h-4 w-4 mr-2" />
                         Add First Expense
                       </Button>
@@ -714,7 +714,7 @@ export default function Dashboard() {
                       View All
                     </Button>
                   </Link>
-                  <Link href="/splits/new">
+                  <Link href="/splits">
                     <Button size="sm" className="bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700">
                       <Users className="h-4 w-4 mr-2" />
                       Split
@@ -742,7 +742,7 @@ export default function Dashboard() {
                     {recentSplits.map((split, index) => (
                       <div
                         key={split.id}
-                        className="flex items-center justify-between p-4 rounded-lg bg-white/40 hover:bg-white/60 transition-all duration-200 group cursor-pointer"
+                        className="flex items-center justify-between p-4 rounded-lg bg-muted/30 hover:bg-muted/50 transition-all duration-200 group cursor-pointer"
                         style={{ animationDelay: `${index * 100}ms` }}
                       >
                         <div className="flex items-center space-x-4 flex-1 min-w-0">
@@ -750,7 +750,7 @@ export default function Dashboard() {
                             <Users className="h-5 w-5" />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <p className="font-medium text-slate-800 group-hover:text-slate-900 truncate">
+                            <p className="font-medium text-foreground group-hover:text-slate-900 truncate">
                               {split.title}
                             </p>
                             <div className="flex items-center space-x-2 mt-1 text-sm text-slate-500">
@@ -773,7 +773,7 @@ export default function Dashboard() {
                           </div>
                         </div>
                         <div className="text-right flex-shrink-0">
-                          <p className="font-semibold text-lg text-slate-800">{formatAmount(split.amount)}</p>
+                          <p className="font-semibold text-lg text-foreground">{formatAmount(split.amount)}</p>
                           <Badge 
                             variant={split.status === 'completed' ? 'default' : 'secondary'}
                             className={`${
@@ -802,10 +802,10 @@ export default function Dashboard() {
                           <div className="text-sm text-green-600">Settled</div>
                         </div>
                         <div>
-                          <div className="text-2xl font-bold text-slate-700">
+                          <div className="text-2xl font-bold text-foreground/90">
                             {formatAmount(recentSplits.reduce((sum, split) => sum + split.amount, 0))}
                           </div>
-                          <div className="text-sm text-slate-600">Total Amount</div>
+                          <div className="text-sm text-muted-foreground">Total Amount</div>
                         </div>
                       </div>
                     </div>
@@ -827,7 +827,7 @@ export default function Dashboard() {
 
           <TabsContent value="analytics" className="space-y-6">
             <div className="grid gap-6 grid-cols-1 xl:grid-cols-2">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle>Monthly Comparison</CardTitle>
                   <CardDescription>Compare your spending patterns</CardDescription>
@@ -836,7 +836,7 @@ export default function Dashboard() {
                   <div className="space-y-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-600">This Month</span>
+                        <span className="text-sm text-muted-foreground">This Month</span>
                         <span className="font-medium">
                           {isBalanceVisible ? formatAmount(stats.monthlySpent) : '••••••'}
                         </span>
@@ -849,7 +849,7 @@ export default function Dashboard() {
                       />
                       
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-600">Last Month</span>
+                        <span className="text-sm text-muted-foreground">Last Month</span>
                         <span className="font-medium">
                           {isBalanceVisible ? formatAmount((stats.monthlySpent || 0) * 0.89) : '••••••'}
                         </span>
@@ -860,7 +860,7 @@ export default function Dashboard() {
                       />
                       
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-slate-600">6-Month Average</span>
+                        <span className="text-sm text-muted-foreground">6-Month Average</span>
                         <span className="font-medium">
                           {isBalanceVisible ? formatAmount((stats.monthlySpent || 0) * 0.95) : '••••••'}
                         </span>
@@ -892,7 +892,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader className="flex flex-row items-center justify-between">
                   <div>
                     <CardTitle>Top Categories</CardTitle>
@@ -911,7 +911,7 @@ export default function Dashboard() {
                       chartData.categoryTotals.slice(0, 5).map((category: any, index: number) => (
                         <div key={category.name || `category-${index}`} className="space-y-2">
                           <div className="flex justify-between text-sm items-center">
-                            <span className="text-slate-600 flex items-center">
+                            <span className="text-muted-foreground flex items-center">
                               <div 
                                 className="w-3 h-3 rounded-full mr-2"
                                 style={{ backgroundColor: category.color || `hsl(${index * 60}, 70%, 60%)` }}
@@ -943,7 +943,7 @@ export default function Dashboard() {
                       ].map((category, index) => (
                         <div key={category.name} className="space-y-2">
                           <div className="flex justify-between text-sm items-center">
-                            <span className="text-slate-600 flex items-center">
+                            <span className="text-muted-foreground flex items-center">
                               <div 
                                 className="w-3 h-3 rounded-full mr-2"
                                 style={{ backgroundColor: `hsl(${index * 60}, 70%, 60%)` }}
@@ -983,16 +983,16 @@ export default function Dashboard() {
             
             {/* Additional Analytics Row */}
             <div className="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-lg">Spending Velocity</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-slate-800 mb-2">
+                    <div className="text-3xl font-bold text-foreground mb-2">
                       ${isBalanceVisible ? stats.avgDailySpend.toFixed(2) : '••••'}
                     </div>
-                    <div className="text-sm text-slate-600">Average per day</div>
+                    <div className="text-sm text-muted-foreground">Average per day</div>
                     <div className="mt-4 text-xs text-slate-500">
                       At this rate, you'll spend ${isBalanceVisible ? (stats.avgDailySpend * 30).toFixed(2) : '••••'} this month
                     </div>
@@ -1000,7 +1000,7 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-lg">Budget Health</CardTitle>
                 </CardHeader>
@@ -1011,7 +1011,7 @@ export default function Dashboard() {
                     }`}>
                       {stats.remainingBudget > 0 ? '✓' : '⚠'}
                     </div>
-                    <div className="text-sm text-slate-600">
+                    <div className="text-sm text-muted-foreground">
                       {stats.remainingBudget > 0 ? 'On Track' : 'Over Budget'}
                     </div>
                     <div className="mt-4 text-xs text-slate-500">
@@ -1021,16 +1021,16 @@ export default function Dashboard() {
                 </CardContent>
               </Card>
               
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle className="text-lg">Category Diversity</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="text-center">
-                    <div className="text-3xl font-bold text-slate-800 mb-2">
+                    <div className="text-3xl font-bold text-foreground mb-2">
                       {stats.categoriesCount}
                     </div>
-                    <div className="text-sm text-slate-600">Active categories</div>
+                    <div className="text-sm text-muted-foreground">Active categories</div>
                     <div className="mt-4 text-xs text-slate-500">
                       {stats.categoriesCount > 5 ? 'Diverse spending' : 'Focused spending'}
                     </div>

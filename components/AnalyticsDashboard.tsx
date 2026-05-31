@@ -102,31 +102,82 @@ const AnalyticsDashboard = () => {
         api.getExpenseTrends({ period: timeRange }),
         api.getCategoryInsights({ period: timeRange }),
         api.getSpendingComparison({ period: timeRange }),
-        api.getSpendingInsights({ period: timeRange }),
-        api.getBudgetAnalytics({ period: timeRange })
+        api.getAnalyticsInsights({ period: timeRange }),
+        api.getBudgetAnalyticsData({ period: timeRange })
       ])
 
-      // Generate mock predictions data since endpoint doesn't exist yet
+      const trends = trendsResponse.data?.trends || []
+      const categories = categoryResponse.data?.categories || []
+      const comparison = comparisonResponse.data?.comparison || []
+      const budgetData = budgetResponse.data || {}
+      const insightsList = insightsResponse.data?.insights || []
+
+      const expenseTrends = trends.map((item: any) => ({
+        period: item._id
+          ? `${item._id.year}-${String(item._id.month || item._id.week || item._id.day || 1).padStart(2, '0')}`
+          : 'Unknown',
+        amount: item.totalAmount || 0,
+        count: item.count || 0,
+        avgAmount: item.avgAmount || 0,
+      }))
+
+      const categoryBreakdown = categories.map((item: any) => ({
+        category: item._id || item.category || 'Other',
+        amount: item.totalAmount || 0,
+        percentage: item.percentage || 0,
+        count: item.count || 0,
+      }))
+
+      const monthlyComparison = comparison.map((item: any) => ({
+        month: item.category || item._id || 'Category',
+        currentYear: item.current || 0,
+        previousYear: item.previous || 0,
+        growth: item.amountChange || 0,
+      }))
+
+      const totalSpent = categoryResponse.data?.totalSpent || budgetData.totalSpent || 0
+      const topCategory = categoryBreakdown[0]
+
       const mockPredictions = {
-        nextMonthPrediction: trendsResponse.data?.totalAmount * 1.1 || 1000,
-        yearEndProjection: trendsResponse.data?.totalAmount * 12 || 12000,
-        savingsPotential: trendsResponse.data?.totalAmount * 0.15 || 150
+        nextMonthPrediction: totalSpent * 1.1 || 1000,
+        yearEndProjection: totalSpent * 12 || 12000,
+        savingsPotential: totalSpent * 0.15 || 150
       }
 
       const combinedData: AnalyticsData = {
-        expenseTrends: trendsResponse.data?.data || [],
-        categoryBreakdown: categoryResponse.data?.data || [],
-        monthlyComparison: comparisonResponse.data?.data || [],
-        spendingInsights: insightsResponse.data?.data || {
-          totalSpent: 0,
-          avgDailySpending: 0,
-          highestCategory: 'Food',
-          mostFrequentCategory: 'Food',
-          spendingTrend: 'stable' as const,
-          monthlyGrowth: 0
+        expenseTrends,
+        categoryBreakdown,
+        monthlyComparison,
+        spendingInsights: {
+          totalSpent,
+          avgDailySpending: budgetData.dailyBurnRate || totalSpent / 30,
+          highestCategory: topCategory?.category || 'Food',
+          mostFrequentCategory: topCategory?.category || 'Food',
+          spendingTrend: budgetData.projectedSpending > budgetData.monthlyBudget
+            ? 'increasing'
+            : 'stable',
+          monthlyGrowth: comparisonResponse.data?.totals?.totalChange || 0,
         },
-        budgetAnalysis: budgetResponse.data?.data || [],
+        budgetAnalysis: (budgetData.categoryBreakdown || []).map((item: any) => {
+          const spent = item.totalAmount || 0
+          const budgeted = budgetData.monthlyBudget
+            ? budgetData.monthlyBudget / Math.max(budgetData.categoryBreakdown.length, 1)
+            : spent
+          const utilization = budgeted > 0 ? (spent / budgeted) * 100 : 0
+          return {
+            category: item._id || item.category || 'Other',
+            budgeted,
+            spent,
+            remaining: Math.max(0, budgeted - spent),
+            utilization,
+            status: utilization > 100 ? 'exceeded' : utilization > 80 ? 'warning' : 'on_track',
+          }
+        }),
         predictions: mockPredictions
+      }
+
+      if (insightsList.length > 0 && combinedData.spendingInsights.totalSpent === 0) {
+        combinedData.spendingInsights.totalSpent = totalSpent
       }
 
       setAnalyticsData(combinedData)

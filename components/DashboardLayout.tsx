@@ -22,13 +22,14 @@ export function DashboardLayout({
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen app-shell">
       {/* Sidebar */}
       {showSidebar && (
         <ModernSidebar 
           isCollapsed={isSidebarCollapsed}
           isMobileMenuOpen={isMobileMenuOpen}
           onToggle={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          onMobileMenuToggle={() => setIsMobileMenuOpen((open) => !open)}
           onMobileMenuClose={() => setIsMobileMenuOpen(false)}
         />
       )}
@@ -49,7 +50,7 @@ export function DashboardLayout({
         )}
         
         {/* Page Content - Full width when sidebar collapsed */}
-        <main className={cn("flex-1 p-6", className)}>
+        <main className={cn("flex-1 p-4 sm:p-6", className)}>
           <div className={cn(
             "mx-auto transition-all duration-300 ease-in-out",
             isSidebarCollapsed ? "max-w-none" : "max-w-7xl"

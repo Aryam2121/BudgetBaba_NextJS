@@ -17,6 +17,7 @@ import {
 } from 'lucide-react'
 import { useSocket } from '@/contexts/SocketContext'
 import { api } from '@/lib/api'
+import { getListFromResponse } from '@/lib/api-utils'
 import { useCurrency } from '@/hooks/useCurrency'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -128,7 +129,7 @@ export function SmartNotificationCenter() {
     try {
       setLoading(true)
       const response = await api.getNotifications()
-      setNotifications(response.data?.data || [])
+      setNotifications(getListFromResponse(response.data, ['notifications']))
     } catch (error) {
       console.error('Failed to load notifications:', error)
     } finally {
@@ -382,7 +383,7 @@ export function SmartNotificationCenter() {
                       return (
                         <div key={notification.id}>
                           <div
-                            className={`p-4 hover:bg-gray-50 transition-colors ${
+                            className={`p-4 hover:bg-muted/40 transition-colors ${
                               !notification.read ? 'bg-blue-50' : ''
                             } ${priorityColors[notification.priority]}`}
                           >

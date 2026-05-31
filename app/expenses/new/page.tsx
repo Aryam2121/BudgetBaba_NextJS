@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Badge } from "@/components/ui/badge"
+import { PageHero, SoftBadge, TipBanner } from "@/components/dashboard/PageSections"
 import { useToast } from "@/hooks/use-toast"
 import { api } from "@/lib/api"
 import { 
@@ -104,7 +104,7 @@ export default function NewExpensePage() {
   if (success) {
     return (
       <ProtectedRoute>
-        <div className="min-h-screen bg-gray-50 py-8">
+        <div className="min-h-screen bg-muted/40 py-8">
           <div className="container mx-auto px-4 max-w-2xl">
             <Card>
               <CardContent className="pt-6">
@@ -146,82 +146,35 @@ export default function NewExpensePage() {
   return (
     <ProtectedRoute>
       <DashboardLayout>
-        {/* Enhanced Header with gradient background */}
-        <div className="mb-8 relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 rounded-2xl"></div>
-          <div className="relative p-8 bg-white/50 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl">
-            <div className="flex items-center justify-between">
-              <div className="space-y-3">
-                <div className="flex items-center space-x-3">
-                  <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
-                    <Plus className="h-8 w-8 text-white" />
-                  </div>
-                  <div>
-                    <h1 className="text-4xl font-bold bg-gradient-to-r from-slate-800 to-slate-600 bg-clip-text text-transparent">
-                      Add New Expense
-                    </h1>
-                    <p className="text-slate-600 text-lg">
-                      Record a new expense and get instant budget insights
-                    </p>
-                  </div>
-                </div>
-                
-                {/* Quick Info Cards */}
-                <div className="flex flex-wrap gap-3 mt-6">
-                  <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200 px-3 py-1">
-                    <Receipt className="h-4 w-4 mr-2" />
-                    Smart Categorization
-                  </Badge>
-                  <Badge variant="outline" className="bg-green-50 text-green-700 border-green-200 px-3 py-1">
-                    <Target className="h-4 w-4 mr-2" />
-                    Budget Tracking
-                  </Badge>
-                  <Badge variant="outline" className="bg-purple-50 text-purple-700 border-purple-200 px-3 py-1">
-                    <Zap className="h-4 w-4 mr-2" />
-                    Instant Alerts
-                  </Badge>
-                </div>
-              </div>
-              
-              {/* Visual elements */}
-              <div className="hidden lg:flex items-center space-x-4">
-                <div className="p-4 bg-gradient-to-br from-green-400 to-blue-500 rounded-2xl shadow-lg transform rotate-12">
-                  <Receipt className="h-12 w-12 text-white" />
-                </div>
-                <div className="p-4 bg-gradient-to-br from-purple-400 to-pink-500 rounded-2xl shadow-lg transform -rotate-6">
-                  <DollarSign className="h-12 w-12 text-white" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <PageHero
+          icon={Plus}
+          title="Add New Expense"
+          subtitle="Record a new expense and get instant budget insights"
+          accent="blue"
+          badges={
+            <>
+              <SoftBadge icon={Receipt} tone="blue">Smart Categorization</SoftBadge>
+              <SoftBadge icon={Target} tone="green">Budget Tracking</SoftBadge>
+              <SoftBadge icon={Zap} tone="purple">Instant Alerts</SoftBadge>
+            </>
+          }
+        />
 
-        {/* Quick Tips */}
-        <Card className="mb-8 bg-gradient-to-r from-amber-50 to-yellow-50 border-amber-200">
-          <CardContent className="p-6">
-            <div className="flex items-start space-x-4">
-              <div className="p-2 bg-amber-200 rounded-lg">
-                <Lightbulb className="h-6 w-6 text-amber-700" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-amber-800 mb-2">💡 Quick Tips</h3>
-                <div className="grid gap-2 md:grid-cols-2">
-                  <p className="text-amber-700 text-sm">• Add expenses immediately for better tracking</p>
-                  <p className="text-amber-700 text-sm">• Use descriptive notes for easier categorization</p>
-                  <p className="text-amber-700 text-sm">• Include vendor details for better reporting</p>
-                  <p className="text-amber-700 text-sm">• Check budget alerts after adding expenses</p>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <TipBanner title="Quick Tips" icon={Lightbulb}>
+          <ul className="grid gap-1 md:grid-cols-2 list-none p-0 m-0 text-sm">
+            <li>• Add expenses immediately for better tracking</li>
+            <li>• Use descriptive notes for easier categorization</li>
+            <li>• Include vendor details for better reporting</li>
+            <li>• Check budget alerts after adding expenses</li>
+          </ul>
+        </TipBanner>
 
         <div className="max-w-2xl mx-auto">
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader>
               <div className="flex items-center space-x-3">
-                <div className="p-2 bg-blue-100 rounded-lg">
-                  <FileText className="h-6 w-6 text-blue-600" />
+                <div className="p-2 bg-blue-500/10 rounded-lg">
+                  <FileText className="h-6 w-6 text-blue-500 dark:text-blue-400" />
                 </div>
                 <div>
                   <CardTitle className="text-2xl">Expense Details</CardTitle>
@@ -306,7 +259,7 @@ export default function NewExpensePage() {
 
                 <div className="space-y-2">
                   <Label htmlFor="note" className="flex items-center space-x-2">
-                    <FileText className="h-4 w-4 text-slate-600" />
+                    <FileText className="h-4 w-4 text-muted-foreground" />
                     <span>Note</span>
                   </Label>
                   <Textarea
@@ -321,7 +274,7 @@ export default function NewExpensePage() {
                 </div>
 
                 <div className="flex gap-4">
-                  <Button type="submit" disabled={loading} className="flex-1 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700">
+                  <Button type="submit" disabled={loading} className="flex-1 brand-btn">
                     {loading ? (
                       <>
                         <Loader2 className="mr-2 h-4 w-4 animate-spin" />

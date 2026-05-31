@@ -6,8 +6,12 @@ const User = require("../models/User")
 
 const getExpenses = async (req, res) => {
   try {
-    const { from, to, category } = req.query
+    const { from, to, category, page: pageQuery, limit: limitQuery } = req.query
     const userId = req.user._id
+
+    const page = Math.max(parseInt(pageQuery, 10) || 1, 1)
+    const limit = Math.min(Math.max(parseInt(limitQuery, 10) || 100, 1), 5000)
+    const skip = (page - 1) * limit
 
     // Build filter object
     const filter = { userId }
@@ -18,15 +22,23 @@ const getExpenses = async (req, res) => {
       if (to) filter.date.$lte = new Date(to)
     }
 
-    if (category && category !== "all") {
+    if (category && category !== "all" && category !== "All Categories") {
       filter.category = category
     }
 
-    const expenses = await Expense.find(filter).sort({ date: -1, createdAt: -1 }).limit(100) // Limit to prevent large responses
+    const [expenses, total] = await Promise.all([
+      Expense.find(filter).sort({ date: -1, createdAt: -1 }).skip(skip).limit(limit),
+      Expense.countDocuments(filter),
+    ])
 
     res.json({
       expenses,
-      total: expenses.length,
+      total,
+      pagination: {
+        page,
+        limit,
+        pages: Math.ceil(total / limit) || 1,
+      },
     })
   } catch (error) {
     console.error("Get expenses error:", error)

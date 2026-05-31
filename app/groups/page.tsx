@@ -15,6 +15,7 @@ import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { api } from '@/lib/api'
+import { getSplitsList } from '@/lib/api-utils'
 import { toast } from 'sonner'
 import {
   Plus,
@@ -94,12 +95,12 @@ export default function GroupsPage() {
       
       // Get splits data to simulate groups
       const response = await api.getSplits()
+      const splits = getSplitsList(response.data)
       
-      if (response.data && response.data.length > 0) {
-        // Transform splits data into groups
+      if (splits.length > 0) {
         const groupsMap = new Map<string, any>()
         
-        response.data.forEach((split: any) => {
+        splits.forEach((split: any) => {
           const groupName = split.description || 'Default Group'
           const groupId = groupName.toLowerCase().replace(/\s+/g, '-')
           
@@ -152,37 +153,8 @@ export default function GroupsPage() {
         
         setGroups(Array.from(groupsMap.values()))
       } else {
-        // Create sample groups if no data
-        setGroups([
-          {
-            id: 'family-group',
-            name: 'Family Expenses',
-            description: 'Shared family expenses and bills',
-            code: 'FAM123',
-            createdBy: user?.id || 'current-user',
-            createdAt: new Date().toISOString(),
-            members: [
-              {
-                id: 'user-1',
-                email: user?.email || 'user@example.com',
-                name: user?.name || 'You',
-                role: 'admin',
-                status: 'active',
-                joinedAt: new Date().toISOString(),
-                totalOwed: 150.00,
-                totalOwes: 75.50
-              }
-            ],
-            totalExpenses: 1250.75,
-            totalSplits: 12,
-            isActive: true,
-            settings: {
-              autoApprove: true,
-              currency: 'USD',
-              allowNonMembers: false
-            }
-          }
-        ])
+        toast.info('No splits found yet. Create a split to see groups here.')
+        setGroups([])
       }
     } catch (error) {
       console.error('Error loading groups:', error)
@@ -328,8 +300,8 @@ export default function GroupsPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Group Management</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Group Management</h1>
+              <p className="text-muted-foreground mt-1">
                 Create and manage expense sharing groups
               </p>
             </div>
@@ -337,7 +309,7 @@ export default function GroupsPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  className="brand-btn"
                   onClick={resetForm}
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -433,49 +405,49 @@ export default function GroupsPage() {
 
           {/* Stats Cards */}
           <div className="grid gap-6 md:grid-cols-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <Users className="h-8 w-8 text-blue-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Groups</p>
-                    <p className="text-2xl font-bold text-slate-800">{totalGroups}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Groups</p>
+                    <p className="text-2xl font-bold text-foreground">{totalGroups}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <CheckCircle2 className="h-8 w-8 text-green-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Active Groups</p>
-                    <p className="text-2xl font-bold text-slate-800">{activeGroups}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Active Groups</p>
+                    <p className="text-2xl font-bold text-foreground">{activeGroups}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <UserPlus className="h-8 w-8 text-purple-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Members</p>
-                    <p className="text-2xl font-bold text-slate-800">{totalMembers}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Members</p>
+                    <p className="text-2xl font-bold text-foreground">{totalMembers}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <DollarSign className="h-8 w-8 text-orange-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Shared</p>
-                    <p className="text-2xl font-bold text-slate-800">${totalExpenses.toFixed(2)}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Shared</p>
+                    <p className="text-2xl font-bold text-foreground">${totalExpenses.toFixed(2)}</p>
                   </div>
                 </div>
               </CardContent>
@@ -484,13 +456,13 @@ export default function GroupsPage() {
 
           {/* Groups Tabs */}
           <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="bg-white/60 backdrop-blur-sm">
+            <TabsList className="dashboard-panel">
               <TabsTrigger value="my-groups">My Groups ({myGroups.length})</TabsTrigger>
               <TabsTrigger value="admin-groups">Admin Groups ({adminGroups.length})</TabsTrigger>
             </TabsList>
 
             <TabsContent value="my-groups" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle>My Groups</CardTitle>
                   <CardDescription>
@@ -530,13 +502,13 @@ export default function GroupsPage() {
                                   <Users className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-slate-800 flex items-center">
+                                  <h3 className="font-semibold text-foreground flex items-center">
                                     {group.name}
                                     {group.members.find(m => m.email === user?.email)?.role === 'admin' && (
                                       <Crown className="h-4 w-4 text-yellow-500 ml-2" />
                                     )}
                                   </h3>
-                                  <p className="text-sm text-slate-600">{group.description}</p>
+                                  <p className="text-sm text-muted-foreground">{group.description}</p>
                                 </div>
                               </div>
                               
@@ -584,21 +556,21 @@ export default function GroupsPage() {
                             
                             <div className="grid grid-cols-3 gap-6 mb-4">
                               <div className="text-center">
-                                <div className="text-2xl font-bold text-slate-800">{group.members.length}</div>
-                                <div className="text-sm text-slate-600">Members</div>
+                                <div className="text-2xl font-bold text-foreground">{group.members.length}</div>
+                                <div className="text-sm text-muted-foreground">Members</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-2xl font-bold text-slate-800">${group.totalExpenses.toFixed(2)}</div>
-                                <div className="text-sm text-slate-600">Total Expenses</div>
+                                <div className="text-2xl font-bold text-foreground">${group.totalExpenses.toFixed(2)}</div>
+                                <div className="text-sm text-muted-foreground">Total Expenses</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-2xl font-bold text-slate-800">{group.totalSplits}</div>
-                                <div className="text-sm text-slate-600">Splits</div>
+                                <div className="text-2xl font-bold text-foreground">{group.totalSplits}</div>
+                                <div className="text-sm text-muted-foreground">Splits</div>
                               </div>
                             </div>
                             
                             <div className="flex items-center space-x-2 mb-3">
-                              <span className="text-sm font-medium text-slate-600">Members:</span>
+                              <span className="text-sm font-medium text-muted-foreground">Members:</span>
                               {group.members.slice(0, 5).map((member, index) => (
                                 <div key={member.id} className="flex items-center space-x-1">
                                   <Avatar className="w-6 h-6">
@@ -633,7 +605,7 @@ export default function GroupsPage() {
                   ) : (
                     <div className="text-center py-8">
                       <Users className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-slate-600 mb-2">No groups yet</h3>
+                      <h3 className="text-lg font-medium text-muted-foreground mb-2">No groups yet</h3>
                       <p className="text-slate-500">Create your first group to start sharing expenses</p>
                     </div>
                   )}
@@ -642,7 +614,7 @@ export default function GroupsPage() {
             </TabsContent>
 
             <TabsContent value="admin-groups" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+              <Card className="dashboard-panel shadow-xl">
                 <CardHeader>
                   <CardTitle>Groups I Manage</CardTitle>
                   <CardDescription>
@@ -661,8 +633,8 @@ export default function GroupsPage() {
                                   <Crown className="h-6 w-6 text-white" />
                                 </div>
                                 <div>
-                                  <h3 className="font-semibold text-slate-800">{group.name}</h3>
-                                  <p className="text-sm text-slate-600">{group.description}</p>
+                                  <h3 className="font-semibold text-foreground">{group.name}</h3>
+                                  <p className="text-sm text-muted-foreground">{group.description}</p>
                                 </div>
                               </div>
                               
@@ -690,22 +662,22 @@ export default function GroupsPage() {
                             
                             <div className="grid grid-cols-4 gap-4">
                               <div className="text-center">
-                                <div className="text-xl font-bold text-slate-800">{group.members.length}</div>
-                                <div className="text-xs text-slate-600">Members</div>
+                                <div className="text-xl font-bold text-foreground">{group.members.length}</div>
+                                <div className="text-xs text-muted-foreground">Members</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xl font-bold text-slate-800">
+                                <div className="text-xl font-bold text-foreground">
                                   {group.members.filter(m => m.status === 'pending').length}
                                 </div>
-                                <div className="text-xs text-slate-600">Pending</div>
+                                <div className="text-xs text-muted-foreground">Pending</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xl font-bold text-slate-800">${group.totalExpenses.toFixed(2)}</div>
-                                <div className="text-xs text-slate-600">Total</div>
+                                <div className="text-xl font-bold text-foreground">${group.totalExpenses.toFixed(2)}</div>
+                                <div className="text-xs text-muted-foreground">Total</div>
                               </div>
                               <div className="text-center">
-                                <div className="text-xl font-bold text-slate-800">{group.totalSplits}</div>
-                                <div className="text-xs text-slate-600">Splits</div>
+                                <div className="text-xl font-bold text-foreground">{group.totalSplits}</div>
+                                <div className="text-xs text-muted-foreground">Splits</div>
                               </div>
                             </div>
                           </CardContent>
@@ -715,7 +687,7 @@ export default function GroupsPage() {
                   ) : (
                     <div className="text-center py-8">
                       <Crown className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                      <h3 className="text-lg font-medium text-slate-600 mb-2">No admin groups</h3>
+                      <h3 className="text-lg font-medium text-muted-foreground mb-2">No admin groups</h3>
                       <p className="text-slate-500">Create a group to become an admin</p>
                     </div>
                   )}
@@ -735,7 +707,7 @@ export default function GroupsPage() {
               </DialogHeader>
               
               <div className="space-y-4">
-                <div className="p-4 bg-slate-50 rounded-lg">
+                <div className="p-4 bg-muted/40 rounded-lg">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-sm font-medium">Group Code:</span>
                     <Button
@@ -747,7 +719,7 @@ export default function GroupsPage() {
                       {selectedGroup?.code}
                     </Button>
                   </div>
-                  <p className="text-xs text-slate-600">
+                  <p className="text-xs text-muted-foreground">
                     Share this code for people to join the group
                   </p>
                 </div>

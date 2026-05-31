@@ -191,6 +191,7 @@ class ApiClient {
     return this.request<{ token: string; user: any }>("/auth/google/callback", {
       method: "POST",
       body: JSON.stringify({ code }),
+      retries: 0,
     })
   }
 
@@ -276,6 +277,10 @@ class ApiClient {
 
   async getDashboardStats() {
     return this.request<any>("/expenses/dashboard/stats")
+  }
+
+  async getHealth() {
+    return this.request<{ status: string; timestamp: string }>("/health")
   }
 
   async getExpenseAnalytics(filters?: {

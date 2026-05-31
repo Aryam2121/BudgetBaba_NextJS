@@ -246,8 +246,8 @@ export default function CategoriesPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Category Management</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Category Management</h1>
+              <p className="text-muted-foreground mt-1">
                 Organize and manage your expense categories
               </p>
             </div>
@@ -255,7 +255,7 @@ export default function CategoriesPage() {
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button 
-                  className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                  className="brand-btn"
                   onClick={resetForm}
                 >
                   <Plus className="h-4 w-4 mr-2" />
@@ -360,49 +360,49 @@ export default function CategoriesPage() {
 
           {/* Stats Cards */}
           <div className="grid gap-6 md:grid-cols-4">
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <Tag className="h-8 w-8 text-blue-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Categories</p>
-                    <p className="text-2xl font-bold text-slate-800">{totalCategories}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Categories</p>
+                    <p className="text-2xl font-bold text-foreground">{totalCategories}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <Eye className="h-8 w-8 text-green-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Active Categories</p>
-                    <p className="text-2xl font-bold text-slate-800">{activeCategories}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Active Categories</p>
+                    <p className="text-2xl font-bold text-foreground">{activeCategories}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <DollarSign className="h-8 w-8 text-purple-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">Total Spent</p>
-                    <p className="text-2xl font-bold text-slate-800">${totalSpent.toFixed(2)}</p>
+                    <p className="text-sm font-medium text-muted-foreground">Total Spent</p>
+                    <p className="text-2xl font-bold text-foreground">${totalSpent.toFixed(2)}</p>
                   </div>
                 </div>
               </CardContent>
             </Card>
             
-            <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+            <Card className="dashboard-panel">
               <CardContent className="p-6">
                 <div className="flex items-center">
                   <Target className="h-8 w-8 text-orange-500" />
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-slate-600">With Budgets</p>
-                    <p className="text-2xl font-bold text-slate-800">{categoriesWithBudget}</p>
+                    <p className="text-sm font-medium text-muted-foreground">With Budgets</p>
+                    <p className="text-2xl font-bold text-foreground">{categoriesWithBudget}</p>
                   </div>
                 </div>
               </CardContent>
@@ -410,7 +410,7 @@ export default function CategoriesPage() {
           </div>
 
           {/* Categories Grid */}
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20 shadow-xl">
+          <Card className="dashboard-panel shadow-xl">
             <CardHeader>
               <CardTitle>Your Categories</CardTitle>
               <CardDescription>
@@ -457,7 +457,7 @@ export default function CategoriesPage() {
                               {category.icon}
                             </div>
                             <div>
-                              <h3 className="font-semibold text-slate-800">{category.name}</h3>
+                              <h3 className="font-semibold text-foreground">{category.name}</h3>
                               <p className="text-xs text-slate-500">
                                 {category.transactionCount} transactions
                               </p>
@@ -498,13 +498,13 @@ export default function CategoriesPage() {
                         
                         <div className="space-y-2">
                           <div className="flex justify-between text-sm">
-                            <span className="text-slate-600">Total Spent:</span>
+                            <span className="text-muted-foreground">Total Spent:</span>
                             <span className="font-semibold">${category.totalSpent.toFixed(2)}</span>
                           </div>
                           
                           {category.averageTransaction > 0 && (
                             <div className="flex justify-between text-sm">
-                              <span className="text-slate-600">Avg Transaction:</span>
+                              <span className="text-muted-foreground">Avg Transaction:</span>
                               <span className="font-semibold">${category.averageTransaction.toFixed(2)}</span>
                             </div>
                           )}
@@ -512,7 +512,7 @@ export default function CategoriesPage() {
                           {category.budgetLimit > 0 && (
                             <div className="space-y-1">
                               <div className="flex justify-between text-sm">
-                                <span className="text-slate-600">Budget:</span>
+                                <span className="text-muted-foreground">Budget:</span>
                                 <span className="font-semibold">${category.budgetLimit.toFixed(2)}</span>
                               </div>
                               <div className="w-full bg-slate-200 rounded-full h-2">
@@ -542,7 +542,7 @@ export default function CategoriesPage() {
               ) : (
                 <div className="text-center py-8">
                   <Tag className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-slate-600 mb-2">No categories found</h3>
+                  <h3 className="text-lg font-medium text-muted-foreground mb-2">No categories found</h3>
                   <p className="text-slate-500">Create your first category to organize your expenses</p>
                 </div>
               )}

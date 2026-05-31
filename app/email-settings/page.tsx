@@ -5,7 +5,8 @@ import { useAuth } from '@/contexts/AuthContext'
 import { DashboardLayout } from '@/components/DashboardLayout'
 import { ProtectedRoute } from '@/components/ProtectedRoute'
 import { EmailPreferences } from '@/components/EmailPreferences'
-import { EmailStatusIndicator } from '@/components/EmailStatusIndicator'
+import { EmailConnectionManager } from '@/components/EmailConnectionManager'
+import { api } from '@/lib/api'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -132,24 +133,34 @@ export default function EmailSettingsPage() {
   const loadEmailSettings = async () => {
     try {
       setLoading(true)
-      
-      // Simulate loading email settings
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Set default email for user
+
+      const response = await api.getEmailStatus()
+      if (response.error) {
+        throw new Error(response.error)
+      }
+
+      const status = response.data
+      const connected = status?.gmail?.connected || status?.outlook?.connected
+      setEmailStatus(connected ? 'connected' : 'disconnected')
+
+      if (status?.gmail?.connectedAt || status?.outlook?.connectedAt) {
+        setLastEmailSent(new Date(status.gmail?.connectedAt || status.outlook?.connectedAt))
+      }
+
       setSettings(prev => ({
         ...prev,
         emailConfig: {
           ...prev.emailConfig,
-          fromEmail: user?.email || '',
-          replyToEmail: user?.email || ''
-        }
+          fromEmail: status?.gmail?.email || status?.outlook?.email || user?.email || '',
+          replyToEmail: user?.email || '',
+          emailProvider: status?.outlook?.connected ? 'outlook' : 'gmail',
+        },
+        notifications: {
+          ...prev.notifications,
+          splitAlerts: status?.preferences?.splitNotifications ?? prev.notifications.splitAlerts,
+          budgetAlerts: status?.preferences?.settlementNotifications ?? prev.notifications.budgetAlerts,
+        },
       }))
-      
-      // Simulate email status check
-      setEmailStatus('connected')
-      setLastEmailSent(new Date(Date.now() - 24 * 60 * 60 * 1000)) // Yesterday
-      
     } catch (error) {
       console.error('Error loading email settings:', error)
       toast.error('Failed to load email settings')
@@ -162,10 +173,19 @@ export default function EmailSettingsPage() {
   const handleSaveSettings = async () => {
     try {
       setSaving(true)
-      
-      // Simulate saving settings
-      await new Promise(resolve => setTimeout(resolve, 1500))
-      
+
+      const response = await api.updateEmailPreferences({
+        splitNotifications: settings.notifications.splitAlerts,
+        settlementNotifications: settings.notifications.budgetAlerts,
+        reminderNotifications: settings.notifications.expenseAlerts,
+        sendFromPersonalEmail: true,
+        preferredProvider: settings.emailConfig.emailProvider === 'outlook' ? 'outlook' : 'gmail',
+      })
+
+      if (response.error) {
+        throw new Error(response.error)
+      }
+
       toast.success('Email settings saved successfully')
     } catch (error) {
       console.error('Error saving settings:', error)
@@ -178,10 +198,14 @@ export default function EmailSettingsPage() {
   const handleTestEmail = async () => {
     try {
       setTesting(true)
-      
-      // Simulate sending test email
-      await new Promise(resolve => setTimeout(resolve, 2000))
-      
+
+      const provider = settings.emailConfig.emailProvider === 'outlook' ? 'outlook' : 'gmail'
+      const response = await api.testEmailConnection(provider)
+
+      if (response.error) {
+        throw new Error(response.error)
+      }
+
       setLastEmailSent(new Date())
       toast.success('Test email sent successfully! Check your inbox.')
     } catch (error) {
@@ -285,14 +309,16 @@ export default function EmailSettingsPage() {
           {/* Header */}
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-slate-800">Email Settings</h1>
-              <p className="text-slate-600 mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Email Settings</h1>
+              <p className="text-muted-foreground mt-1">
                 Configure email notifications and preferences
               </p>
             </div>
             
             <div className="flex items-center space-x-3">
-              <EmailStatusIndicator />
+              <Badge variant={emailStatus === 'connected' ? 'default' : 'secondary'}>
+                {emailStatus === 'connected' ? 'Connected' : emailStatus === 'error' ? 'Error' : 'Not connected'}
+              </Badge>
               <Button variant="outline" onClick={handleImportSettings}>
                 <Upload className="h-4 w-4 mr-2" />
                 Import
@@ -304,7 +330,7 @@ export default function EmailSettingsPage() {
               <Button 
                 onClick={handleSaveSettings}
                 disabled={saving}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                className="brand-btn"
               >
                 {saving ? (
                   <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
@@ -316,8 +342,13 @@ export default function EmailSettingsPage() {
             </div>
           </div>
 
+          <div className="grid gap-6 lg:grid-cols-2">
+            <EmailConnectionManager />
+            <EmailPreferences />
+          </div>
+
           {/* Status Card */}
-          <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+          <Card className="dashboard-panel">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
@@ -331,10 +362,10 @@ export default function EmailSettingsPage() {
                      <AlertTriangle className="h-6 w-6" />}
                   </div>
                   <div>
-                    <h3 className="font-semibold text-slate-800">
+                    <h3 className="font-semibold text-foreground">
                       Email Service Status
                     </h3>
-                    <p className="text-sm text-slate-600">
+                    <p className="text-sm text-muted-foreground">
                       {emailStatus === 'connected' && 'Email service is working properly'}
                       {emailStatus === 'error' && 'Email service has encountered an error'}
                       {emailStatus === 'disconnected' && 'Email service is not configured'}
@@ -365,7 +396,7 @@ export default function EmailSettingsPage() {
 
           {/* Settings Tabs */}
           <Tabs defaultValue="notifications" className="space-y-6">
-            <TabsList className="bg-white/60 backdrop-blur-sm">
+            <TabsList className="dashboard-panel">
               <TabsTrigger value="notifications">Notifications</TabsTrigger>
               <TabsTrigger value="schedule">Schedule</TabsTrigger>
               <TabsTrigger value="configuration">Configuration</TabsTrigger>
@@ -375,7 +406,7 @@ export default function EmailSettingsPage() {
             <TabsContent value="notifications" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Summary Notifications */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Calendar className="h-5 w-5 mr-2" />
@@ -425,7 +456,7 @@ export default function EmailSettingsPage() {
                 </Card>
 
                 {/* Alert Notifications */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Bell className="h-5 w-5 mr-2" />
@@ -500,7 +531,7 @@ export default function EmailSettingsPage() {
               </div>
 
               {/* Alert Thresholds */}
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+              <Card className="dashboard-panel">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Zap className="h-5 w-5 mr-2" />
@@ -557,7 +588,7 @@ export default function EmailSettingsPage() {
             </TabsContent>
 
             <TabsContent value="schedule" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+              <Card className="dashboard-panel">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Clock className="h-5 w-5 mr-2" />
@@ -630,7 +661,7 @@ export default function EmailSettingsPage() {
             <TabsContent value="configuration" className="space-y-6">
               <div className="grid gap-6 lg:grid-cols-2">
                 {/* Email Configuration */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Mail className="h-5 w-5 mr-2" />
@@ -720,7 +751,7 @@ export default function EmailSettingsPage() {
                 </Card>
 
                 {/* Email Signature */}
-                <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+                <Card className="dashboard-panel">
                   <CardHeader>
                     <CardTitle className="flex items-center">
                       <Send className="h-5 w-5 mr-2" />
@@ -750,7 +781,7 @@ export default function EmailSettingsPage() {
             </TabsContent>
 
             <TabsContent value="preferences" className="space-y-6">
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+              <Card className="dashboard-panel">
                 <CardHeader>
                   <CardTitle className="flex items-center">
                     <Eye className="h-5 w-5 mr-2" />
@@ -834,7 +865,7 @@ export default function EmailSettingsPage() {
               </Card>
 
               {/* Preview Card */}
-              <Card className="bg-white/60 backdrop-blur-sm border-white/20">
+              <Card className="dashboard-panel">
                 <CardHeader>
                   <CardTitle>Email Preview</CardTitle>
                   <CardDescription>
@@ -842,7 +873,7 @@ export default function EmailSettingsPage() {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="p-4 border rounded-lg bg-slate-50 space-y-3">
+                  <div className="p-4 border rounded-lg bg-muted/40 space-y-3">
                     <div className="border-b pb-2">
                       <div className="text-sm font-medium">Subject: Weekly Expense Summary - March 18, 2024</div>
                       <div className="text-xs text-slate-500">From: {settings.emailConfig.fromEmail || 'noreply@app.com'}</div>
